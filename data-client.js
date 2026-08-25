@@ -1,7 +1,7 @@
 ﻿(function () {
   "use strict";
 
-  var API_BASE = "https://nzx-api.REPLACE_WITH_SUBDOMAIN.workers.dev";
+  var API_BASE = "https://dtmgzhiojlhrlqwczhxs.supabase.co/functions/v1/nzx-api";
 
   function request(url, options) {
     options = Object.assign({ credentials: "include" }, options || {});

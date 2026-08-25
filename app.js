@@ -18,7 +18,7 @@
   var LOGIN_DIALOG_ID = "login-dialog";
   var PROFILE_DIALOG_ID = "profile-dialog";
   var TOAST_ID = "toast-region";
-  var API_BASE = "https://nzx-api.REPLACE_WITH_SUBDOMAIN.workers.dev";
+  var API_BASE = "https://dtmgzhiojlhrlqwczhxs.supabase.co/functions/v1/nzx-api";
   var IDENTITIES = [
     { value: "individual", label: "个体户（普通农户）" },
     { value: "consumer", label: "消费者" },

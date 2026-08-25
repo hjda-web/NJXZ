@@ -583,7 +583,7 @@ async function getVarietyRows() {
   if (!varietyRowsPromise) {
     varietyRowsPromise = loadVarietyRows();
   }
-  return varietyRowsPromise;
+  return await varietyRowsPromise;
 }
 
 async function loadVarietyRows() {
@@ -630,7 +630,7 @@ function collectVarieties(node, rows) {
   }
 }
 
-function findVarietyIds(product) {
+async function findVarietyIds(product) {
   const rows = [];
   const aliases = {
     "番茄": "西红柿",
@@ -647,7 +647,7 @@ function findVarietyIds(product) {
     "红椒": "红辣椒"
   };
   const lookup = aliases[product.trim()] || product.trim();
-  const allRows = globalVarietyRows || [];
+  const allRows = await getVarietyRows();
   const exact = allRows
     .filter((row) => row.name.toLowerCase() === lookup.toLowerCase())
     .map((row) => row.id);
@@ -726,7 +726,7 @@ async function fetchMarketPrices(varietyId, product, city, limit, refresh) {
 async function getPrices(product, city, limit, refresh) {
   const items = [];
   if (product && product.trim()) {
-    for (const varietyId of findVarietyIds(product)) {
+    for (const varietyId of await findVarietyIds(product)) {
       const fetched = await fetchMarketPrices(varietyId, product, city, Math.max(1, limit - items.length), refresh);
       items.push(...fetched);
       if (items.length >= limit) {
@@ -738,7 +738,7 @@ async function getPrices(product, city, limit, refresh) {
 
   const defaults = ["大白菜", "土豆", "猪肉", "鸡蛋", "苹果"];
   for (const defaultProduct of defaults) {
-    for (const id of findVarietyIds(defaultProduct)) {
+    for (const id of await findVarietyIds(defaultProduct)) {
       const fetched = await fetchMarketPrices(id, defaultProduct, city, Math.max(1, limit - items.length), refresh);
       items.push(...fetched);
       if (items.length >= Math.max(2, Math.floor(limit / 5))) {
@@ -1301,12 +1301,12 @@ async function handleGroupList(request, env) {
   }
   const isManager = ["village_head", "cooperative_leader"].includes(user.identity) || (await isGroupAdmin(env, user.phone));
   const managed = isManager ? await managedGroups(env, user.phone) : [];
-  const myGroup = await myGroup(env, user.phone);
+  const myGroupData = await myGroup(env, user.phone);
   return json(200, {
     success: true,
     user: await publicUser(user, env),
     managedGroups: await Promise.all(managed.map((group) => groupView(group, env))),
-    myGroup: myGroup ? await groupView(myGroup, env) : null
+    myGroup: myGroupData ? await groupView(myGroupData, env) : null
   });
 }
 

@@ -5,4 +5,4 @@ compatibility_date = "2026-08-25"
 [[d1_databases]]
 binding = "DB"
 database_name = "nzx-db"
-database_id = "PLACEHOLDER"
+database_id = "63a4b45e-aeea-4aa0-9241-060962f51a82"
