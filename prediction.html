@@ -1,0 +1,116 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>农价先知 · 价格预测</title>
+  <link rel="stylesheet" href="alerts.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">价格预测</p>
+        <h1>1 ~ 180 天价格预测</h1>
+      </div>
+      <div class="heading-actions">
+        <span class="last-updated" id="prediction-updated">--</span>
+        <button class="primary-button" id="favorite-button" type="button">收藏此品种</button>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="预测条件">
+      <label class="field">
+        <span>品种</span>
+        <select id="prediction-product"></select>
+      </label>
+      <label class="field">
+        <span>所在城市</span>
+        <select id="prediction-city"></select>
+      </label>
+      <label class="field prediction-range-field">
+        <span>预测周期：<strong id="prediction-days-label">7 天</strong></span>
+        <input id="prediction-range" type="range" min="1" max="180" step="1" value="7">
+      </label>
+      <div class="field">
+        <span>显示方式</span>
+        <div class="segmented" id="prediction-view-toggle">
+          <button class="active" type="button" data-view="chart">曲线图</button>
+          <button type="button" data-view="table">数据表</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="panel chart-card" id="prediction-chart-panel">
+        <div class="panel-header">
+          <div>
+            <h2>预测走势</h2>
+            <span class="small" id="prediction-subtitle">土豆 · 成都某批发市场</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="prediction-chart"></div>
+          <div class="chart-legend">
+            <span style="color:#0f766e;">实时价格锚点</span>
+            <span style="color:#ea580c;">预测均值</span>
+            <span style="color:#93c5fd;">置信区间</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-stack">
+        <div class="panel risk-card" id="risk-card">
+          <h3>滞销风险结论</h3>
+          <div class="risk-score-large" id="risk-level">--</div>
+          <div class="risk-score-large risk-high" id="risk-score">--</div>
+          <p id="risk-reason"></p>
+          <div class="risk-factors" id="risk-factors"></div>
+        </div>
+
+        <div class="panel" style="margin-top:18px;">
+          <div class="panel-header"><h3>预测因子</h3></div>
+          <div class="panel-body">
+            <div class="metric-grid">
+              <div class="metric-box"><span>主模型</span><strong id="model-name">--</strong></div>
+              <div class="metric-box"><span>天气适宜度</span><strong id="model-weather">--</strong></div>
+              <div class="metric-box"><span>供给压力</span><strong id="model-supply">--</strong></div>
+            </div>
+            <div class="factor-note" id="factor-note"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="table-panel" id="prediction-table-panel" style="margin-top:18px;" hidden>
+      <div class="table-toolbar">
+        <div>
+          <h2>预测数据</h2>
+          <span class="result-count" id="forecast-count">共 0 条</span>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>预测均价</th>
+              <th>置信下限</th>
+              <th>置信上限</th>
+              <th>较当前</th>
+            </tr>
+          </thead>
+          <tbody id="forecast-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="mock-data.js"></script>
+  <script src="charts.js"></script>
+  <script src="data-client.js"></script>
+  <script src="app.js"></script>
+  <script src="prediction.js"></script>
+</body>
+</html>

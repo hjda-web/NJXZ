@@ -1,0 +1,128 @@
+[
+  {
+    "Product": "大米",
+    "Category": "粮油",
+    "Year": "2025",
+    "Metric": "全国稻谷产量同比",
+    "Change": 0.7,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "面粉",
+    "Category": "粮油",
+    "Year": "2025",
+    "Metric": "全国小麦产量同比",
+    "Change": 0.0,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "玉米",
+    "Category": "粮油",
+    "Year": "2025",
+    "Metric": "全国玉米产量同比",
+    "Change": 2.1,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "花生",
+    "Category": "粮油",
+    "Year": "2025",
+    "Metric": "全国油料产量同比（花生单项使用同组参考）",
+    "Change": 2.9,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "猪肉",
+    "Category": "肉禽蛋",
+    "Year": "2025",
+    "Metric": "全国猪肉产量同比",
+    "Change": 4.1,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "牛肉",
+    "Category": "肉禽蛋",
+    "Year": "2025",
+    "Metric": "全国牛肉产量同比",
+    "Change": 2.8,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "羊肉",
+    "Category": "肉禽蛋",
+    "Year": "2025",
+    "Metric": "全国羊肉产量同比",
+    "Change": -4.2,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "鸡肉",
+    "Category": "肉禽蛋",
+    "Year": "2025",
+    "Metric": "全国禽肉产量同比",
+    "Change": 6.7,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "鸭肉",
+    "Category": "肉禽蛋",
+    "Year": "2025",
+    "Metric": "全国禽肉产量同比（鸭肉使用禽肉合计参考）",
+    "Change": 6.7,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "鸡蛋",
+    "Category": "肉禽蛋",
+    "Year": "2025",
+    "Metric": "全国禽蛋产量同比",
+    "Change": -2.5,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "牛奶",
+    "Category": "副食",
+    "Year": "2025",
+    "Metric": "全国牛奶产量同比",
+    "Change": 0.3,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "草鱼",
+    "Category": "水产",
+    "Year": "2025",
+    "Metric": "全国水产品总产量同比（草鱼使用水产品合计参考）",
+    "Change": 4.1,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "鲫鱼",
+    "Category": "水产",
+    "Year": "2025",
+    "Metric": "全国水产品总产量同比（鲫鱼使用水产品合计参考）",
+    "Change": 4.1,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  },
+  {
+    "Product": "基围虾",
+    "Category": "水产",
+    "Year": "2025",
+    "Metric": "全国水产养殖产量同比（基围虾使用养殖产量参考）",
+    "Change": 4.4,
+    "Source": "国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》",
+    "SourceUrl": "https://www.gov.cn/lianbo/202602/content_7059980.htm"
+  }
+]

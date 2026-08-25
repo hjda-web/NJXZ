@@ -1,0 +1,114 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>农价先知 · 风险预警</title>
+  <link rel="stylesheet" href="alerts.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">预警中心</p>
+        <h1>风险预警与“我的提醒”</h1>
+      </div>
+      <div class="heading-actions">
+        <span class="last-updated">最后更新：<strong id="last-updated">--</strong></span>
+        <button class="primary-button" id="refresh-button" type="button">刷新数据</button>
+      </div>
+    </section>
+
+    <section class="stat-grid" aria-label="风险统计">
+      <article class="stat-tile stat-high">
+        <span class="stat-value" id="high-count">0</span>
+        <span class="stat-label">高风险</span>
+      </article>
+      <article class="stat-tile stat-medium">
+        <span class="stat-value" id="medium-count">0</span>
+        <span class="stat-label">中风险</span>
+      </article>
+      <article class="stat-tile stat-low">
+        <span class="stat-value" id="low-count">0</span>
+        <span class="stat-label">低风险</span>
+      </article>
+      <article class="stat-tile stat-neutral">
+        <span class="stat-value" id="unread-count">0</span>
+        <span class="stat-label">未读提醒</span>
+      </article>
+    </section>
+
+    <section class="toolbar" aria-label="预警筛选">
+      <label class="field">
+        <span>所在城市</span>
+        <select id="filter-city"></select>
+      </label>
+      <label class="field">
+        <span>风险等级</span>
+        <select id="filter-level">
+          <option value="">全部风险等级</option>
+          <option value="high">高风险</option>
+          <option value="medium">中风险</option>
+          <option value="low">低风险</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>品种</span>
+        <select id="filter-product"><option value="">全部品种</option></select>
+      </label>
+      <label class="field">
+        <span>状态</span>
+        <select id="filter-status">
+          <option value="">全部状态</option>
+          <option value="unread">未读</option>
+          <option value="read">已读</option>
+        </select>
+      </label>
+      <label class="field search-field">
+        <span>关键词</span>
+        <input id="search-input" type="search" placeholder="品种、市场或风险理由">
+      </label>
+      <button class="secondary-button" id="reset-button" type="button">重置</button>
+    </section>
+
+    <section class="table-panel" aria-label="预警列表">
+      <div class="table-toolbar">
+        <div>
+          <h2>预警列表</h2>
+          <span class="result-count" id="result-count">共 0 条</span>
+        </div>
+        <button class="text-button" id="mark-all-button" type="button">全部标记已读</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>级别</th>
+              <th>品种</th>
+              <th>市场</th>
+              <th>风险分</th>
+              <th>风险理由</th>
+              <th>更新时间</th>
+              <th>状态</th>
+              <th class="action-column">操作</th>
+            </tr>
+          </thead>
+          <tbody id="alerts-body"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="empty-state" hidden>没有符合筛选条件的预警</div>
+    </section>
+
+    <aside class="risk-note">
+      <strong>风险说明</strong>
+      <span>预测结果仅供参考，不构成交易承诺；需结合市场信息和人工判断。</span>
+    </aside>
+  </main>
+
+  <script src="mock-data.js"></script>
+  <script src="data-client.js"></script>
+  <script src="app.js"></script>
+  <script src="alerts.js"></script>
+</body>
+</html>

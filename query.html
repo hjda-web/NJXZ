@@ -1,0 +1,119 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>农价先知 · 价格查询</title>
+  <link rel="stylesheet" href="alerts.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">价格查询</p>
+        <h1>实时价格查询与市场对比</h1>
+      </div>
+      <div class="heading-actions">
+        <span class="last-updated">显示：<strong id="range-label">20</strong> 条实时报价</span>
+        <button class="primary-button" id="download-button" type="button">导出 CSV</button>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="查询条件">
+      <label class="field">
+        <span>分类</span>
+        <select id="query-category"></select>
+      </label>
+      <label class="field">
+        <span>细分类</span>
+        <select id="query-subcategory"></select>
+      </label>
+      <label class="field">
+        <span>品种</span>
+        <select id="query-product"></select>
+      </label>
+      <label class="field">
+        <span>所在城市</span>
+        <select id="query-city"></select>
+      </label>
+      <label class="field">
+        <span>显示条数</span>
+        <select id="query-range">
+          <option value="10">10 条</option>
+          <option value="20" selected>20 条</option>
+          <option value="50">50 条</option>
+        </select>
+      </label>
+      <button class="primary-button" id="query-button" type="button">查询</button>
+    </section>
+
+    <section class="content-grid">
+      <div class="panel chart-card">
+        <div class="panel-header">
+          <div>
+            <h2>价格走势</h2>
+            <span class="small" id="chart-subtitle">猪肉 · 成都市实时行情</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="query-chart"></div>
+          <div class="chart-legend">
+            <span style="color:#0f766e;">均价</span>
+            <span>单位：元/公斤或元/升</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>统计摘要</h2>
+            <span class="small">当前筛选范围</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="metric-grid">
+            <div class="metric-box"><span>最新价格</span><strong id="query-latest">--</strong></div>
+            <div class="metric-box"><span>区间最低</span><strong id="query-min">--</strong></div>
+            <div class="metric-box"><span>区间最高</span><strong id="query-max">--</strong></div>
+          </div>
+          <ul class="result-list" id="query-insights"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="table-panel" style="margin-top:18px;">
+      <div class="table-toolbar">
+        <div>
+          <h2>查询结果</h2>
+          <span class="result-count" id="query-count">共 0 条</span>
+        </div>
+        <div class="query-pager" id="query-pager"></div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>产品</th>
+              <th>产地</th>
+              <th>均价</th>
+              <th>单位</th>
+              <th>价格区间</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody id="query-body"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="query-empty" hidden>没有查询结果</div>
+    </section>
+  </main>
+
+  <script src="mock-data.js"></script>
+  <script src="data-client.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+  <script src="query.js"></script>
+</body>
+</html>

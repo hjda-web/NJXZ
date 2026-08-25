@@ -1,0 +1,160 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>农价先知 · 管理后台</title>
+  <link rel="stylesheet" href="alerts.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">管理员工作台</p>
+        <h1>数据、模型与系统管理</h1>
+      </div>
+      <div class="heading-actions">
+        <span class="last-updated">本页仅管理员可用</span>
+        <button class="primary-button" id="admin-refresh" type="button">刷新状态</button>
+      </div>
+    </section>
+
+    <nav class="admin-tabs" aria-label="管理功能">
+      <button class="active" type="button" data-tab="data">数据源管理</button>
+      <button type="button" data-tab="model">模型管理</button>
+      <button type="button" data-tab="logs">操作日志</button>
+      <button type="button" data-tab="settings">系统设置</button>
+    </nav>
+
+    <section class="tab-view" id="tab-data">
+      <div class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>导入 / 刷新数据</h2>
+              <span class="small">第一版仅支持手动触发</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <label class="field">
+              <span>数据源</span>
+              <select id="data-source">
+                <option value="api">公开农产品价格 API</option>
+                <option value="csv">CSV 文件</option>
+              </select>
+            </label>
+            <div class="file-drop">
+              <div>
+                <strong>上传 CSV 文件</strong>
+                <div>包含品种、市场、日期、价格、单位、数据来源</div>
+                <input id="csv-file" type="file" accept=".csv,text/csv">
+              </div>
+            </div>
+            <div style="margin-top:14px;display:flex;gap:10px;">
+              <button class="primary-button" id="import-button" type="button">开始导入</button>
+              <button class="secondary-button" id="api-refresh-button" type="button">立即刷新 API</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>校验结果</h2>
+              <span class="small" id="import-time">尚未执行</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <ul class="result-list" id="import-result"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-panel" style="margin-top:18px;">
+        <div class="table-toolbar">
+          <div>
+            <h2>最近数据记录</h2>
+            <span class="result-count">模拟记录</span>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>品种</th><th>日期</th><th>价格</th><th>来源</th><th>状态</th></tr></thead>
+            <tbody id="data-records"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-view" id="tab-model" hidden>
+      <div class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>模型任务</h2>
+              <span class="small">基线、ARIMA、可选 Prophet</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="select-grid">
+              <label class="field"><span>训练品种</span><select id="train-product"></select></label>
+              <label class="field"><span>训练市场</span><select id="train-market"></select></label>
+              <label class="field"><span>预测天数</span><select id="train-days"><option value="7">7 天</option><option value="14">14 天</option></select></label>
+            </div>
+            <button class="primary-button" id="train-button" type="button" style="margin-top:14px;">开始训练与评估</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h2>最近模型结果</h2></div>
+          <div class="panel-body">
+            <div class="metric-grid">
+              <div class="metric-box"><span>模型</span><strong id="trained-model">--</strong></div>
+              <div class="metric-box"><span>MAPE</span><strong id="trained-mape">--</strong></div>
+              <div class="metric-box"><span>RMSE</span><strong id="trained-rmse">--</strong></div>
+            </div>
+            <ul class="result-list" id="model-result"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-view" id="tab-logs" hidden>
+      <div class="table-panel">
+        <div class="table-toolbar">
+          <div>
+            <h2>操作日志</h2>
+            <span class="result-count" id="log-count"></span>
+          </div>
+          <button class="text-button" id="clear-logs" type="button">清空显示</button>
+        </div>
+        <div class="table-wrap">
+          <table class="admin-log-table">
+            <thead><tr><th>时间</th><th>操作</th><th>结果</th><th>详情</th></tr></thead>
+            <tbody id="log-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-view" id="tab-settings" hidden>
+      <div class="panel">
+        <div class="panel-header"><h2>系统设置</h2></div>
+        <div class="panel-body">
+          <div class="select-grid">
+            <label class="field"><span>风险评分跌幅权重</span><input id="weight-change" type="number" min="0" max="100" value="50"></label>
+            <label class="field"><span>波动权重</span><input id="weight-volatility" type="number" min="0" max="100" value="30"></label>
+            <label class="field"><span>提示权重</span><input id="weight-signal" type="number" min="0" max="100" value="20"></label>
+          </div>
+          <button class="primary-button" id="save-settings" type="button" style="margin-top:14px;">保存设置</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="mock-data.js"></script>
+  <script src="app.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

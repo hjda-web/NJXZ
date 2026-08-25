@@ -1,0 +1,16 @@
+{
+  "p": 3,
+  "d": 1,
+  "q": 2,
+  "ar": [-0.210019, -0.115782, -0.023228],
+  "ma": [-0.065101, -0.218523],
+  "mean": -0.005614844,
+  "sigma": 0.017037455,
+  "source": "北京新发地白条猪历史行情，按成都当前实时价格基准对齐",
+  "paperParameters": "ARIMA(3,1,2)",
+  "paperSource": "基于ARIMA模型的中国生猪价格的短期预测",
+  "trainingDays": 29,
+  "validationDay1Error": 0.0726,
+  "validationDay30Error": 1.1899,
+  "fixedAt": "2026-08-25"
+}

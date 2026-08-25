@@ -1,0 +1,118 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>农价先知 · 首页</title>
+  <link rel="stylesheet" href="alerts.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="search-hero">
+      <p class="eyebrow">农产品价格预测平台</p>
+      <h1>农价先知</h1>
+      <p>查看历史价格走势、预测未来变化，并及时了解滞销风险。</p>
+      <form class="hero-search" id="hero-search">
+        <select id="home-city" aria-label="所在城市"></select>
+        <input id="hero-keyword" type="search" placeholder="输入农产品名称">
+        <button class="primary-button" type="submit">查询</button>
+      </form>
+      <div class="quick-links" id="quick-links"></div>
+    </section>
+
+    <section class="stat-grid" id="home-stat-grid" aria-label="数据统计"></section>
+
+    <section class="panel" style="margin-top:18px;">
+      <div class="panel-header">
+        <div>
+          <h2>所在城市实时天气</h2>
+          <span class="small" id="weather-city-label">成都市</span>
+        </div>
+        <span class="small" id="weather-updated"></span>
+      </div>
+      <div class="panel-body">
+        <div class="weather-grid" id="weather-content"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="home-group-panel" style="margin-top:18px;" hidden>
+      <div class="panel-header">
+        <div>
+          <h2>我的小组与推荐种植</h2>
+          <span class="small" id="home-group-subtitle"></span>
+        </div>
+        <a class="text-button group-link" href="/NJXZ/group.html">查看小组</a>
+      </div>
+      <div class="panel-body" id="home-group-content"></div>
+    </section>
+
+    <section class="panel" style="margin-top:18px;">
+      <div class="panel-header">
+        <div>
+          <h2>全国实时行情</h2>
+          <span class="small" id="price-source-label">北京新发地</span>
+        </div>
+        <span class="small" id="price-updated"></span>
+      </div>
+      <div class="panel-body">
+        <ul class="trend-list" id="live-price-list"></ul>
+      </div>
+    </section>
+
+    <section class="content-grid" style="margin-top:18px;">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>重点品种走势</h2>
+            <span class="small">今日实时均价对比</span>
+          </div>
+          <a class="text-button" href="/NJXZ/query.html">查看查询页</a>
+        </div>
+        <div class="panel-body">
+          <div class="mini-chart" id="home-chart"></div>
+          <div class="chart-legend">
+            <span style="color:#0f766e;">实时批发价</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>最新风险预警</h2>
+            <span class="small">按风险分从高到低</span>
+          </div>
+          <a class="text-button" href="/NJXZ/alerts.html">查看全部</a>
+        </div>
+        <div class="panel-body">
+          <ul class="trend-list" id="home-alerts"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:18px;">
+      <div class="panel-header">
+        <div>
+          <h2>常见农产品</h2>
+          <span class="small">覆盖蔬菜、菌菇、水果、粮油、肉禽蛋、水产等</span>
+        </div>
+        <span class="small" id="product-count"></span>
+      </div>
+      <div class="panel-body">
+        <div class="catalog-navigator" id="product-catalog">
+          <div class="catalog-top-tabs" id="product-category-tabs"></div>
+          <div class="catalog-sub-tabs" id="product-subcategory-tabs"></div>
+          <div class="catalog-products" id="product-cloud"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="mock-data.js"></script>
+  <script src="data-client.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+  <script src="home.js"></script>
+</body>
+</html>

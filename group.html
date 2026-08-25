@@ -1,0 +1,103 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>农价先知 · 组队合作</title>
+  <link rel="stylesheet" href="alerts.css">
+  <link rel="stylesheet" href="pages.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">组队合作</p>
+        <h1>小组与推荐种植管理</h1>
+      </div>
+      <span class="last-updated" id="group-role-label">--</span>
+    </section>
+
+    <section id="group-member-panel" class="panel" hidden></section>
+
+    <section id="group-manager-panel" hidden>
+      <div class="panel manager-panel">
+        <div class="panel-header">
+          <div>
+            <h2>我的小组</h2>
+            <span class="small" id="group-count-label">共 0 个小组</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="group-toolbar">
+            <label class="field"><span>当前小组</span><select id="group-select"></select></label>
+            <label class="field"><span>新建小组</span><input id="group-name-input" type="text" maxlength="30" placeholder="小组名称"></label>
+            <button class="primary-button" id="group-create-button" type="button">新建小组</button>
+            <button class="secondary-button danger-button" id="group-delete-button" type="button">解散小组</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-panel manager-panel">
+        <div class="table-toolbar">
+          <div>
+            <h2>组员管理</h2>
+            <span class="result-count" id="member-count">共 0 人</span>
+          </div>
+          <div class="add-member-form">
+            <label class="field"><span>添加个体户</span><input id="member-phone-input" type="tel" maxlength="11" inputmode="numeric" placeholder="11 位手机号"></label>
+            <button class="primary-button" id="member-add-button" type="button">添加组员</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>组员</th>
+                <th>城市</th>
+                <th>角色</th>
+                <th>推荐种植</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="group-members-body"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="group-members-empty" hidden>当前小组暂无组员</div>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="login-dialog recommendation-dialog" id="recommend-dialog">
+    <form id="recommend-form" novalidate>
+      <div class="dialog-head">
+        <div>
+          <p class="eyebrow">推荐种植</p>
+          <h2 id="recommend-title">为组员设置品种</h2>
+        </div>
+        <button class="dialog-close" id="recommend-close" type="button" aria-label="关闭">×</button>
+      </div>
+      <label class="login-field">
+        <span>系统推荐</span>
+        <div class="recommend-candidates" id="recommend-candidates"></div>
+      </label>
+      <label class="login-field">
+        <span>手动添加品种</span>
+        <div class="recommend-manual">
+          <select id="recommend-product-select"></select>
+          <button class="secondary-button" id="recommend-add-button" type="button">添加</button>
+        </div>
+      </label>
+      <label class="login-field">
+        <span>当前已选</span>
+        <div class="recommend-selected" id="recommend-selected"></div>
+      </label>
+      <p class="login-error" id="recommend-error" role="alert"></p>
+      <button class="primary-button login-submit" id="recommend-save-button" type="button">保存推荐</button>
+    </form>
+  </dialog>
+
+  <script src="data-client.js"></script>
+  <script src="app.js"></script>
+  <script src="group.js"></script>
+</body>
+</html>
