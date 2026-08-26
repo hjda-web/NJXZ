@@ -23,16 +23,29 @@
 
     <section class="stat-grid" id="home-stat-grid" aria-label="数据统计"></section>
 
-    <section class="panel" style="margin-top:18px;">
-      <div class="panel-header">
-        <div>
-          <h2>所在城市实时天气</h2>
-          <span class="small" id="weather-city-label">成都市</span>
+    <section class="content-grid" style="margin-top:18px;">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>当前所在地区推荐种植</h2>
+            <span class="small" id="region-province-label">四川省</span>
+          </div>
         </div>
-        <span class="small" id="weather-updated"></span>
+        <div class="panel-body">
+          <div id="region-crops-content"></div>
+        </div>
       </div>
-      <div class="panel-body">
-        <div class="weather-grid" id="weather-content"></div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>当前节气农事</h2>
+            <span class="small" id="solar-term-label">处暑</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="solar-term-content" id="solar-term-content"></div>
+        </div>
       </div>
     </section>
 
@@ -64,16 +77,13 @@
       <div class="panel">
         <div class="panel-header">
           <div>
-            <h2>重点品种走势</h2>
-            <span class="small">今日实时均价对比</span>
+            <h2>种植与肥料</h2>
+            <span class="small">地区推荐、常种作物、小组推荐</span>
           </div>
-          <a class="text-button" href="/NJXZ/query.html">查看查询页</a>
         </div>
         <div class="panel-body">
-          <div class="mini-chart" id="home-chart"></div>
-          <div class="chart-legend">
-            <span style="color:#0f766e;">实时批发价</span>
-          </div>
+          <div id="fertilizer-board"></div>
+          <div class="fertilizer-prices" id="fertilizer-prices"></div>
         </div>
       </div>
 
@@ -87,6 +97,10 @@
         </div>
         <div class="panel-body">
           <ul class="trend-list" id="home-alerts"></ul>
+          <div class="frequent-risk-block" id="frequent-risk-block" hidden>
+            <h3>我的常种作物风险</h3>
+            <ul class="trend-list" id="frequent-risk-list"></ul>
+          </div>
         </div>
       </div>
     </section>

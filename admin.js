@@ -18,6 +18,7 @@
     renderImportResult(["尚未执行导入或刷新", "等待管理员操作"]);
     renderDataRecords();
     renderLogs();
+    bindAgriData();
     switchTab(currentTab);
   }
 
@@ -68,9 +69,108 @@
     document.querySelectorAll(".admin-tabs button").forEach(function (button) {
       button.classList.toggle("active", button.getAttribute("data-tab") === tab);
     });
-    ["data", "model", "logs", "settings"].forEach(function (name) {
+    ["data", "model", "logs", "settings", "agri"].forEach(function (name) {
       document.getElementById("tab-" + name).hidden = name !== tab;
     });
+  }
+
+  function bindAgriData() {
+    document.getElementById("agri-region-save").addEventListener("click", saveRegion);
+    document.getElementById("agri-term-save").addEventListener("click", saveTerm);
+    document.getElementById("agri-fertilizer-save").addEventListener("click", saveFertilizerRule);
+    document.getElementById("agri-price-save").addEventListener("click", saveFertilizerPrice);
+    loadAgriData();
+  }
+
+  function loadAgriData() {
+    Promise.all([
+      NZX_DATA_API.adminRegionCrops(),
+      NZX_DATA_API.adminSolarTerms(),
+      NZX_DATA_API.adminFertilizerRules(),
+      NZX_DATA_API.adminFertilizerPrices()
+    ]).then(function (results) {
+      renderAgriList("agri-region-list", results[0], "province", function (row) {
+        return (row.crops || []).join("、");
+      }, function (row) {
+        return deleteRegionRow(row);
+      });
+      renderAgriList("agri-term-list", results[1], "term", function (row) {
+        return row.tasks;
+      }, function (row) {
+        return deleteTermRow(row);
+      });
+      renderAgriList("agri-fertilizer-list", results[2], "crop", function (row) {
+        return (row.fertilizers || [row.fertilizer]).filter(Boolean).join("、");
+      }, function (row) {
+        return deleteFertilizerRow(row);
+      });
+      renderAgriList("agri-price-list", results[3], "fertilizer", function (row) {
+        var minPrice = row.minPrice !== undefined ? row.minPrice : row.min_price;
+        var maxPrice = row.maxPrice !== undefined ? row.maxPrice : row.max_price;
+        return Number(minPrice) + " 到 " + Number(maxPrice) + " " + (row.unit || "元/吨");
+      }, function (row) {
+        return deletePriceRow(row);
+      });
+    }).catch(function () {
+      NZX_APP.showToast("农事资料加载失败", "error");
+    });
+  }
+
+  function renderAgriList(id, rows, keyName, detailFn, deleteFn) {
+    var box = document.getElementById(id);
+    if (!box) {
+      return;
+    }
+    box.innerHTML = rows.map(function (row) {
+      return '<div class="agri-list-item"><strong>' + escapeHtml(row[keyName] || "") +
+        '</strong><span>' + escapeHtml(detailFn(row)) + '</span>' +
+        '<button type="button" class="text-button agri-delete">删除</button></div>';
+    }).join("");
+    box.querySelectorAll(".agri-delete").forEach(function (button, index) {
+      button.addEventListener("click", function () { deleteFn(rows[index]); });
+    });
+  }
+
+  function saveRegion() {
+    var province = document.getElementById("agri-region-province").value.trim();
+    var crops = document.getElementById("agri-region-crops").value.split(/[、,，]/).map(function (item) { return item.trim(); }).filter(Boolean);
+    NZX_DATA_API.saveRegionCrops(province, crops).then(loadAgriData).catch(function () { NZX_APP.showToast("保存失败", "error"); });
+  }
+
+  function deleteRegionRow(row) {
+    NZX_DATA_API.deleteRegionCrops(row.province).then(loadAgriData).catch(function () { NZX_APP.showToast("删除失败", "error"); });
+  }
+
+  function saveTerm() {
+    var term = document.getElementById("agri-term").value.trim();
+    var tasks = document.getElementById("agri-tasks").value.trim();
+    NZX_DATA_API.saveSolarTerm(term, tasks).then(loadAgriData).catch(function () { NZX_APP.showToast("保存失败", "error"); });
+  }
+
+  function deleteTermRow(row) {
+    NZX_DATA_API.deleteSolarTerm(row.term).then(loadAgriData).catch(function () { NZX_APP.showToast("删除失败", "error"); });
+  }
+
+  function saveFertilizerRule() {
+    var crop = document.getElementById("agri-fertilizer-crop").value.trim();
+    var fertilizers = document.getElementById("agri-fertilizer-values").value.split(/[、,，]/).map(function (item) { return item.trim(); }).filter(Boolean);
+    NZX_DATA_API.saveFertilizerRule(crop, fertilizers).then(loadAgriData).catch(function () { NZX_APP.showToast("保存失败", "error"); });
+  }
+
+  function deleteFertilizerRow(row) {
+    NZX_DATA_API.deleteFertilizerRule(row.crop).then(loadAgriData).catch(function () { NZX_APP.showToast("删除失败", "error"); });
+  }
+
+  function saveFertilizerPrice() {
+    var name = document.getElementById("agri-price-name").value.trim();
+    var minPrice = Number(document.getElementById("agri-price-min").value);
+    var maxPrice = Number(document.getElementById("agri-price-max").value);
+    var unit = document.getElementById("agri-price-unit").value.trim() || "元/吨";
+    NZX_DATA_API.saveFertilizerPrice(name, minPrice, maxPrice, unit).then(loadAgriData).catch(function () { NZX_APP.showToast("保存失败", "error"); });
+  }
+
+  function deletePriceRow(row) {
+    NZX_DATA_API.deleteFertilizerPrice(row.fertilizer).then(loadAgriData).catch(function () { NZX_APP.showToast("删除失败", "error"); });
   }
 
   function renderImportResult(lines) {

@@ -1,0 +1,494 @@
+[
+    {
+        "crop":  "大白菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "小白菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "娃娃菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "油菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "上海青",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "菜心",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "芥菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "雪里蕻",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "菠菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "空心菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "苋菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "生菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "油麦菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "茼蒿",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "香菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "芹菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "西芹",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "韭菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "韭黄",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "抱子甘蓝",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "莴苣",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "菊苣",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "苦苣",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "罗马生菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "紫苏",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "薄荷",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "罗勒",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "香椿",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "马齿苋",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "蕨菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "红薯叶",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "南瓜藤",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "木耳菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "芦蒿",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "水芹",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "西兰花",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "花菜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "土豆",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "红薯",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "山药",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "芋头",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "莲藕",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "马蹄",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "茭白",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "竹笋",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "莴笋",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "芦笋",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "生姜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "水萝卜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "胡萝卜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "白萝卜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "青萝卜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "心里美萝卜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "冬瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "南瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "西葫芦",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "黄瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "苦瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "丝瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "节瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "佛手瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "瓠瓜",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "茄子",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "番茄",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "青椒",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "彩椒",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "尖椒",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "红椒",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "秋葵",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "玉米笋",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "豆角",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "豇豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "豌豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "荷兰豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "毛豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "四季豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "扁豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "甜豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "黄豆芽",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "绿豆芽",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "豌豆苗",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "蒜苗",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "大葱",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "小葱",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "洋葱",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "大蒜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "蒜薹",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "金针菇",
+        "fertilizer":  "不适用"
+    },
+    {
+        "crop":  "香菇",
+        "fertilizer":  "不适用"
+    },
+    {
+        "crop":  "平菇",
+        "fertilizer":  "不适用"
+    },
+    {
+        "crop":  "杏鲍菇",
+        "fertilizer":  "不适用"
+    },
+    {
+        "crop":  "口蘑",
+        "fertilizer":  "不适用"
+    },
+    {
+        "crop":  "木耳",
+        "fertilizer":  "不适用"
+    },
+    {
+        "crop":  "银耳",
+        "fertilizer":  "不适用"
+    },
+    {
+        "crop":  "海带",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "紫菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "裙带菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "海发菜",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "苹果",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "香蕉",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "橙子",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "梨",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "葡萄",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "草莓",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "西瓜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "哈密瓜",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "菠萝",
+        "fertilizer":  "钾肥"
+    },
+    {
+        "crop":  "猕猴桃",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "牛油果",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "柠檬",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "桃",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "李子",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "樱桃",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "火龙果",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "芒果",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "大米",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "小米",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "玉米",
+        "fertilizer":  "氮肥"
+    },
+    {
+        "crop":  "黄豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "绿豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "红豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "豌豆",
+        "fertilizer":  "磷肥"
+    },
+    {
+        "crop":  "花生",
+        "fertilizer":  "磷肥"
+    }
+]

@@ -1,0 +1,6 @@
+[
+  { "fertilizer": "氮肥", "minPrice": 1600, "maxPrice": 1700, "unit": "元/吨" },
+  { "fertilizer": "磷肥", "minPrice": 4400, "maxPrice": 4700, "unit": "元/吨" },
+  { "fertilizer": "钾肥", "minPrice": 3100, "maxPrice": 3350, "unit": "元/吨" },
+  { "fertilizer": "磷钾复合肥", "minPrice": 8800, "maxPrice": 9100, "unit": "元/吨" }
+]

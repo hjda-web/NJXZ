@@ -82,7 +82,8 @@ function makeDbAdapter() {
         nickname: params[6],
         city: params[7],
         created_at: params[8],
-        last_login_at: params[9]
+        last_login_at: params[9],
+        common_crops: params[10] || []
       };
       prefer = "resolution=merge-duplicates,return=representation";
     } else if (text.includes("INSERT INTO sessions")) {
@@ -141,6 +142,69 @@ function makeDbAdapter() {
   };
 }
 
+function makeDataAdapter() {
+  async function request(method, table, query, body, prefer) {
+    const url = `${NZ_SUPABASE_URL}/rest/v1/${table}${query || ""}`;
+    const headers = {
+      apikey: NZ_SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${NZ_SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json"
+    };
+    if (prefer) {
+      headers.Prefer = prefer;
+    }
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body)
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`${method} ${table} failed: ${response.status} ${text}`);
+    }
+    return response;
+  }
+
+  function normalizeBody(table, body) {
+    if (!body) {
+      return body;
+    }
+    if (table === "fertilizer_prices") {
+      return {
+        fertilizer: body.fertilizer,
+        min_price: body.minPrice,
+        max_price: body.maxPrice,
+        unit: body.unit
+      };
+    }
+    return body;
+  }
+
+  return {
+    async get(table) {
+      const query = table === "group_messages"
+        ? "?select=*&order=created_at.asc"
+        : "?select=*";
+      const response = await request("GET", table, query);
+      return response.json().catch(() => []);
+    },
+    async post(table, body) {
+      const prefer = table === "group_messages"
+        ? "return=representation"
+        : "resolution=merge-duplicates,return=representation";
+      const response = await request("POST", table, "", normalizeBody(table, body), prefer);
+      await response.text().catch(() => "");
+      return { success: true };
+    },
+    async delete(table, keyName, keyValue) {
+      const query = `?${encodeURIComponent(keyName)}=eq.${encodeURIComponent(keyValue)}`;
+      const response = await request("DELETE", table, query);
+      await response.text().catch(() => "");
+      return { success: true };
+    }
+  };
+}
+
 Deno.serve(async (request) => {
   try {
     const original = new URL(request.url);
@@ -151,7 +215,10 @@ Deno.serve(async (request) => {
       headers: request.headers,
       body: request.body
     });
-    return await nzx_worker.fetch(internalRequest, { DB: makeDbAdapter() });
+    return await nzx_worker.fetch(internalRequest, {
+      DB: makeDbAdapter(),
+      DATA: makeDataAdapter()
+    });
   } catch (error) {
     return new Response(String(error && error.stack ? error.stack : error), {
       status: 500,

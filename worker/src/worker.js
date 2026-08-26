@@ -5,6 +5,10 @@ import supplyIndexData from "../data/supply-index.json";
 import arimaModelData from "../data/arima-model.json";
 import arimaHistoryData from "../data/arima-history.json";
 import arimaCategoryMuData from "../data/arima-category-mu.json";
+import regionCropsData from "../data/region-crops.json";
+import solarTermsData from "../data/solar-terms.json";
+import fertilizerXlsxData from "../data/fertilizer-xlsx.json";
+import fertilizerPricesData from "../data/fertilizer-prices.json";
 
 const ORIGIN = "https://hjda-web.github.io";
 const PFSC_KEY = "7s9K$pG2xQ8zR5mB7vA3sD9fH2jW40cV";
@@ -18,6 +22,8 @@ const catalog = catalogData.categories || [];
 const weatherRules = new Map();
 const supplyRecords = new Map();
 const categoryMeans = new Map();
+const regionCropsMap = new Map();
+const fertilizerXlsxMap = new Map();
 
 for (const group of weatherRulesData || []) {
   for (const product of group.Products || []) {
@@ -42,6 +48,14 @@ for (const record of supplyIndexData || []) {
 
 for (const row of arimaCategoryMuData.categories || []) {
   categoryMeans.set(row.category, Number(row.mean));
+}
+
+for (const row of regionCropsData || []) {
+  regionCropsMap.set(row.province, row.crops || []);
+}
+
+for (const row of fertilizerXlsxData || []) {
+  fertilizerXlsxMap.set(row.crop, row.fertilizer || "");
 }
 
 const productCatalog = buildCatalog(catalog);
@@ -74,7 +88,7 @@ export default {
           status: 204,
           headers: {
             "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+            "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
             "Access-Control-Max-Age": "86400"
           }
         })
@@ -97,6 +111,75 @@ export default {
 
       if (path === "api/catalog") {
         return json(200, { success: true, catalog: catalogData });
+      }
+
+      if (path === "api/region-crops" && method === "GET") {
+        const province = (query.get("province") || "").trim();
+        return json(200, await getRegionCrops(env, province));
+      }
+
+      if (path === "api/solar-term" && method === "GET") {
+        return json(200, solarTermForDate(query.get("date") || ""));
+      }
+
+      if (path === "api/fertilizer-rules" && method === "GET") {
+        return json(200, await getFertilizerRules(env));
+      }
+
+      if (path === "api/fertilizer-prices" && method === "GET") {
+        return json(200, await getFertilizerPrices(env));
+      }
+
+      if (path === "api/group-messages" && method === "GET") {
+        return handleGroupMessagesList(request, env);
+      }
+
+      if (path === "api/group-messages" && method === "POST") {
+        return handleGroupMessageCreate(request, env);
+      }
+
+      if (path === "api/group-messages/delete" && method === "POST") {
+        return handleGroupMessageDelete(request, env);
+      }
+
+      if (path === "api/admin/region-crops" && method === "GET") {
+        return requireAdminThen(request, env, async () => json(200, await getRegionCrops(env)));
+      }
+      if (path === "api/admin/region-crops" && method === "POST") {
+        return requireAdminThen(request, env, async () => handleAdminRegionCropSave(request, env));
+      }
+      if (path === "api/admin/region-crops" && method === "DELETE") {
+        return requireAdminThen(request, env, async () => handleAdminRegionCropDelete(request, env));
+      }
+
+      if (path === "api/admin/solar-terms" && method === "GET") {
+        return requireAdminThen(request, env, async () => json(200, await getSolarTerms(env)));
+      }
+      if (path === "api/admin/solar-terms" && method === "POST") {
+        return requireAdminThen(request, env, async () => handleAdminSolarTermSave(request, env));
+      }
+      if (path === "api/admin/solar-terms" && method === "DELETE") {
+        return requireAdminThen(request, env, async () => handleAdminSolarTermDelete(request, env));
+      }
+
+      if (path === "api/admin/fertilizer-rules" && method === "GET") {
+        return requireAdminThen(request, env, async () => json(200, await getFertilizerRules(env)));
+      }
+      if (path === "api/admin/fertilizer-rules" && method === "POST") {
+        return requireAdminThen(request, env, async () => handleAdminFertilizerRuleSave(request, env));
+      }
+      if (path === "api/admin/fertilizer-rules" && method === "DELETE") {
+        return requireAdminThen(request, env, async () => handleAdminFertilizerRuleDelete(request, env));
+      }
+
+      if (path === "api/admin/fertilizer-prices" && method === "GET") {
+        return requireAdminThen(request, env, async () => json(200, await getFertilizerPrices(env)));
+      }
+      if (path === "api/admin/fertilizer-prices" && method === "POST") {
+        return requireAdminThen(request, env, async () => handleAdminFertilizerPriceSave(request, env));
+      }
+      if (path === "api/admin/fertilizer-prices" && method === "DELETE") {
+        return requireAdminThen(request, env, async () => handleAdminFertilizerPriceDelete(request, env));
       }
 
       if (path === "api/session") {
@@ -264,6 +347,21 @@ function bool(value) {
   return value === true || value === 1 || value === "1";
 }
 
+function parseStringArray(value) {
+  if (Array.isArray(value)) {
+    return value.map(String).filter(Boolean);
+  }
+  if (!value) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -371,6 +469,87 @@ function fallbackProducts(product, maxCount) {
   return (productCatalog.subcategoryProducts.get(item.subcategory) || [])
     .filter((name) => name.toLowerCase() !== product.toLowerCase())
     .slice(0, maxCount || 4);
+}
+
+const solarTermDates = [
+  ["立春", "02-04"], ["雨水", "02-19"], ["惊蛰", "03-05"], ["春分", "03-20"],
+  ["清明", "04-05"], ["谷雨", "04-20"], ["立夏", "05-05"], ["小满", "05-21"],
+  ["芒种", "06-06"], ["夏至", "06-21"], ["小暑", "07-07"], ["大暑", "07-23"],
+  ["立秋", "08-07"], ["处暑", "08-23"], ["白露", "09-08"], ["秋分", "09-23"],
+  ["寒露", "10-08"], ["霜降", "10-23"], ["立冬", "11-07"], ["小雪", "11-22"],
+  ["大雪", "12-07"], ["冬至", "12-22"], ["小寒", "01-05"], ["大寒", "01-20"]
+];
+
+const highSugarProducts = new Set([
+  "苹果", "香蕉", "橙子", "梨", "葡萄", "草莓", "西瓜", "哈密瓜", "菠萝",
+  "猕猴桃", "牛油果", "柠檬", "桃", "李子", "樱桃", "火龙果", "芒果",
+  "红薯", "山药", "芋头", "莲藕", "马蹄", "胡萝卜"
+]);
+
+function provinceForCity(cityName) {
+  const city = cities.find((item) => item.name === cityName);
+  return city ? city.province : "";
+}
+
+function solarTermForDate(dateString) {
+  const date = dateString ? new Date(`${dateString}T12:00:00+08:00`) : new Date(Date.now() + 8 * 60 * 60 * 1000);
+  if (Number.isNaN(date.getTime())) {
+    return { term: "", tasks: "" };
+  }
+  const monthDay = date.toISOString().slice(5, 10);
+  const currentIndex = solarTermDates.findIndex((item) => item[1] >= monthDay);
+  let termIndex;
+  if (currentIndex === -1) {
+    termIndex = solarTermDates.length - 1;
+  } else if (currentIndex === 0) {
+    termIndex = solarTermDates.length - 2;
+  } else {
+    termIndex = currentIndex - 1;
+  }
+  const termName = solarTermDates[termIndex][0];
+  const term = solarTermsData.find((item) => item.term === termName);
+  return term ? term : { term: termName, tasks: "" };
+}
+
+function fertilizersForProduct(product) {
+  const item = catalogFind(product);
+  const fertilizers = new Set();
+  const xlsxFertilizer = fertilizerXlsxMap.get(product);
+  if (xlsxFertilizer && xlsxFertilizer !== "不适用") {
+    fertilizers.add(xlsxFertilizer);
+  }
+
+  if (item) {
+    const subcategory = item.subcategory;
+    if (["叶菜类", "葱蒜类", "芽苗类", "粮油类", "藻类"].includes(subcategory)) {
+      fertilizers.add("氮肥");
+    }
+    if (["瓜茄类", "鲜豆类", "干豆类"].includes(subcategory)) {
+      fertilizers.add("磷肥");
+    }
+    if (subcategory === "根茎类") {
+      fertilizers.add("钾肥");
+    }
+    if (highSugarProducts.has(product)) {
+      fertilizers.add("钾肥");
+    }
+  }
+
+  return Array.from(fertilizers).filter((item) => item !== "不适用");
+}
+
+function uniqueFertilizersForCrops(crops) {
+  const result = [];
+  const seen = new Set();
+  for (const crop of crops || []) {
+    for (const fertilizer of fertilizersForProduct(crop)) {
+      if (!seen.has(fertilizer)) {
+        seen.add(fertilizer);
+        result.push(fertilizer);
+      }
+    }
+  }
+  return result;
 }
 
 function getRule(product) {
@@ -1233,6 +1412,7 @@ async function handleLogin(request, env) {
   const password = String(data.password || "");
   const city = String(data.city || "");
   const identity = String(data.identity || "").trim();
+  const commonCrops = Array.isArray(data.commonCrops) ? data.commonCrops : undefined;
 
   if (!/^[0-9]{11}$/.test(phone)) {
     return json(400, { success: false, message: "invalid_phone" });
@@ -1258,12 +1438,13 @@ async function handleLogin(request, env) {
     return json(401, { success: false, message: "invalid_password" });
   }
 
-  if (city && cities.some((item) => item.name === city)) {
-    await updateProfile(env, user.phone, "", city, null);
+  if ((city && cities.some((item) => item.name === city)) || commonCrops !== undefined) {
+    await updateProfile(env, user.phone, "", city || user.city, null, commonCrops);
   }
 
+  const refreshedUser = await findUser(env, user.phone);
   const session = await createSession(env, user.phone);
-  return json(200, { success: true, user: await publicUser(user, env) }, {
+  return json(200, { success: true, user: await publicUser(refreshedUser, env) }, {
     "Set-Cookie": `sid=${session.token}; Max-Age=2592000; Path=/; HttpOnly; Secure; SameSite=None`
   });
 }
@@ -1281,6 +1462,7 @@ async function handleProfile(request, env) {
   const nickname = String(data.nickname || "").trim();
   const city = String(data.city || "").trim();
   const largeFont = data.largeFont === undefined ? null : Boolean(data.largeFont);
+  const commonCrops = Array.isArray(data.commonCrops) ? data.commonCrops : undefined;
 
   if (nickname && (nickname.length < 2 || nickname.length > 20)) {
     return json(400, { success: false, message: "invalid_nickname" });
@@ -1289,7 +1471,7 @@ async function handleProfile(request, env) {
     return json(400, { success: false, message: "invalid_city" });
   }
 
-  await updateProfile(env, user.phone, nickname, city, largeFont);
+  await updateProfile(env, user.phone, nickname, city, largeFont, commonCrops);
   const updated = await findUser(env, user.phone);
   return json(200, { success: true, user: await publicUser(updated, env) });
 }
@@ -1487,7 +1669,30 @@ async function handleGroupRecommendProducts(request, env, query) {
   if (!cities.some((item) => item.name === city)) {
     return json(400, { success: false, message: "invalid_city" });
   }
-  const items = await buildRecommendationCandidates(city, 12);
+  const candidates = await buildRecommendationCandidates(city, 10000);
+  const province = provinceForCity(city);
+  const regionRow = regionCropsData.find((item) => item.province === province);
+  const regionSet = new Set(regionRow ? regionRow.crops : []);
+  const coastalProvinces = new Set(["天津", "河北", "辽宁", "上海", "江苏", "浙江", "福建", "山东", "广东", "广西", "海南", "台湾", "香港", "澳门"]);
+  const isCoastal = coastalProvinces.has(province);
+  const incompatibleSubcategories = isCoastal ? [] : ["鱼类", "虾蟹贝类", "藻类"];
+  const items = candidates
+    .filter((item) => {
+      const catalogItem = catalogFind(item.product);
+      if (catalogItem && incompatibleSubcategories.includes(catalogItem.subcategory)) {
+        return false;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      const aRegion = regionSet.has(a.product) ? 0 : 1;
+      const bRegion = regionSet.has(b.product) ? 0 : 1;
+      if (aRegion !== bRegion) {
+        return aRegion - bRegion;
+      }
+      return b.score - a.score;
+    })
+    .slice(0, 12);
   return json(200, { success: true, city, items });
 }
 
@@ -1631,8 +1836,8 @@ async function findUser(env, phone) {
 
 async function saveUser(env, user) {
   await env.DB.prepare(`
-    INSERT INTO users (phone, hash, salt, role, identity, large_font, nickname, city, created_at, last_login_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO users (phone, hash, salt, role, identity, large_font, nickname, city, created_at, last_login_at, common_crops)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(phone) DO UPDATE SET
       hash = excluded.hash,
       salt = excluded.salt,
@@ -1642,7 +1847,8 @@ async function saveUser(env, user) {
       nickname = excluded.nickname,
       city = excluded.city,
       created_at = excluded.created_at,
-      last_login_at = excluded.last_login_at
+      last_login_at = excluded.last_login_at,
+      common_crops = excluded.common_crops
   `).bind(
     user.phone,
     user.hash,
@@ -1653,7 +1859,8 @@ async function saveUser(env, user) {
     user.nickname || "",
     user.city || "",
     user.createdAt,
-    user.lastLoginAt
+    user.lastLoginAt,
+    JSON.stringify(user.commonCrops || [])
   ).run();
 }
 
@@ -1668,7 +1875,8 @@ function rowToUser(row) {
     nickname: row.nickname || "",
     city: row.city || "",
     createdAt: row.created_at,
-    lastLoginAt: row.last_login_at
+    lastLoginAt: row.last_login_at,
+    commonCrops: parseStringArray(row.common_crops)
   };
 }
 
@@ -1705,7 +1913,7 @@ async function deleteSession(env, token) {
   await env.DB.prepare("DELETE FROM sessions WHERE token = ?").bind(token).run();
 }
 
-async function updateProfile(env, phone, nickname, city, largeFont) {
+async function updateProfile(env, phone, nickname, city, largeFont, commonCrops) {
   const user = await findUser(env, phone);
   if (!user) {
     return;
@@ -1718,6 +1926,9 @@ async function updateProfile(env, phone, nickname, city, largeFont) {
   }
   if (largeFont !== null && user.identity === "individual") {
     user.largeFont = largeFont;
+  }
+  if (commonCrops !== undefined) {
+    user.commonCrops = Array.from(new Set((commonCrops || []).map(String).filter(Boolean))).slice(0, 50);
   }
   await saveUser(env, user);
 }
@@ -1738,6 +1949,7 @@ async function authenticateUser(env, phone, password, identity) {
       largeFont: identity === "individual",
       nickname: `用户${phone.slice(7)}`,
       city: "",
+      commonCrops: [],
       createdAt: nowIso(),
       lastLoginAt: nowIso()
     };
@@ -1800,6 +2012,7 @@ async function publicUser(user, env) {
     role: user.role,
     identity: user.identity,
     largeFont: user.largeFont,
+    commonCrops: user.commonCrops || [],
     groupAdmin: await isGroupAdmin(env, user.phone),
     createdAt: user.createdAt,
     lastLoginAt: user.lastLoginAt
@@ -1910,4 +2123,206 @@ async function memberView(member, env) {
     joinedAt: member.joinedAt,
     updatedAt: member.updatedAt
   };
+}
+
+async function requireAdminThen(request, env, handler) {
+  const user = await currentUser(request, env);
+  if (!user || user.role !== "admin") {
+    return json(403, { success: false, message: "forbidden" });
+  }
+  return handler(user);
+}
+
+async function dataGet(env, table, fallback) {
+  if (env.DATA && typeof env.DATA.get === "function") {
+    try {
+      const rows = await env.DATA.get(table);
+      if (Array.isArray(rows)) {
+        return rows;
+      }
+    } catch (error) {
+      // Fall through to static data when the table has not been provisioned yet.
+    }
+  }
+  return fallback || [];
+}
+
+async function dataPost(env, table, body) {
+  if (!env.DATA || typeof env.DATA.post !== "function") {
+    return null;
+  }
+  return env.DATA.post(table, body);
+}
+
+async function dataDelete(env, table, keyName, keyValue) {
+  if (!env.DATA || typeof env.DATA.delete !== "function") {
+    return null;
+  }
+  return env.DATA.delete(table, keyName, keyValue);
+}
+
+async function getRegionCrops(env, province) {
+  const rows = await dataGet(env, "region_crops", regionCropsData);
+  if (province) {
+    const row = rows.find((item) => item.province === province);
+    return {
+      province,
+      available: Boolean(row),
+      crops: row ? row.crops || [] : []
+    };
+  }
+  return rows;
+}
+
+async function getSolarTerms(env) {
+  return dataGet(env, "solar_terms", solarTermsData);
+}
+
+async function getFertilizerRules(env) {
+  return dataGet(env, "fertilizer_rules", fertilizerXlsxData);
+}
+
+async function getFertilizerPrices(env) {
+  return dataGet(env, "fertilizer_prices", fertilizerPricesData);
+}
+
+async function handleAdminRegionCropSave(request, env) {
+  const data = await readJsonBody(request);
+  const province = String(data.province || "").trim();
+  const crops = Array.isArray(data.crops)
+    ? data.crops.map(String).map((item) => item.trim()).filter(Boolean)
+    : String(data.crops || "").split(/[、,，]/).map((item) => item.trim()).filter(Boolean);
+  if (!province) {
+    return json(400, { success: false, message: "invalid_province" });
+  }
+  await dataPost(env, "region_crops", { province, crops });
+  return json(200, { success: true, row: { province, crops } });
+}
+
+async function handleAdminRegionCropDelete(request, env) {
+  const data = await readJsonBody(request);
+  const province = String(data.province || "").trim();
+  await dataDelete(env, "region_crops", "province", province);
+  return json(200, { success: true });
+}
+
+async function handleAdminSolarTermSave(request, env) {
+  const data = await readJsonBody(request);
+  const term = String(data.term || "").trim();
+  const tasks = String(data.tasks || "").trim();
+  if (!term || !tasks) {
+    return json(400, { success: false, message: "invalid_solar_term" });
+  }
+  await dataPost(env, "solar_terms", { term, tasks });
+  return json(200, { success: true, row: { term, tasks } });
+}
+
+async function handleAdminSolarTermDelete(request, env) {
+  const data = await readJsonBody(request);
+  await dataDelete(env, "solar_terms", "term", String(data.term || "").trim());
+  return json(200, { success: true });
+}
+
+async function handleAdminFertilizerRuleSave(request, env) {
+  const data = await readJsonBody(request);
+  const crop = String(data.crop || "").trim();
+  const fertilizers = Array.isArray(data.fertilizers)
+    ? data.fertilizers.map(String).filter(Boolean)
+    : [String(data.fertilizer || "").trim()].filter(Boolean);
+  if (!crop || !fertilizers.length) {
+    return json(400, { success: false, message: "invalid_fertilizer_rule" });
+  }
+  await dataPost(env, "fertilizer_rules", { crop, fertilizers });
+  return json(200, { success: true, row: { crop, fertilizers } });
+}
+
+async function handleAdminFertilizerRuleDelete(request, env) {
+  const data = await readJsonBody(request);
+  await dataDelete(env, "fertilizer_rules", "crop", String(data.crop || "").trim());
+  return json(200, { success: true });
+}
+
+async function handleAdminFertilizerPriceSave(request, env) {
+  const data = await readJsonBody(request);
+  const fertilizer = String(data.fertilizer || "").trim();
+  const minPrice = Number(data.minPrice);
+  const maxPrice = Number(data.maxPrice);
+  const unit = String(data.unit || "元/吨").trim();
+  if (!fertilizer || !Number.isFinite(minPrice) || !Number.isFinite(maxPrice)) {
+    return json(400, { success: false, message: "invalid_fertilizer_price" });
+  }
+  await dataPost(env, "fertilizer_prices", { fertilizer, minPrice, maxPrice, unit });
+  return json(200, { success: true, row: { fertilizer, minPrice, maxPrice, unit } });
+}
+
+async function handleAdminFertilizerPriceDelete(request, env) {
+  const data = await readJsonBody(request);
+  await dataDelete(env, "fertilizer_prices", "fertilizer", String(data.fertilizer || "").trim());
+  return json(200, { success: true });
+}
+
+async function handleGroupMessagesList(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) {
+    return json(401, { success: false, message: "not_logged_in" });
+  }
+  const group = await myGroup(env, user.phone);
+  if (!group) {
+    return json(200, { success: true, items: [] });
+  }
+  const rows = await dataGet(env, "group_messages", []);
+  const items = rows
+    .filter((item) => item.group_id === group.id)
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  return json(200, { success: true, items });
+}
+
+async function handleGroupMessageCreate(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) {
+    return json(401, { success: false, message: "not_logged_in" });
+  }
+  const group = await myGroup(env, user.phone);
+  if (!group) {
+    return json(403, { success: false, message: "group_membership_not_found" });
+  }
+  const data = await readJsonBody(request);
+  const content = String(data.content || "").trim();
+  if (!content || content.length > 500) {
+    return json(400, { success: false, message: "invalid_message" });
+  }
+  const row = {
+    id: crypto.randomUUID().replace(/-/g, ""),
+    group_id: group.id,
+    sender_phone: user.phone,
+    nickname: user.nickname || `用户${maskPhone(user.phone)}`,
+    content,
+    created_at: nowIso()
+  };
+  await dataPost(env, "group_messages", row);
+  return json(200, { success: true, item: row });
+}
+
+async function handleGroupMessageDelete(request, env) {
+  const user = await currentUser(request, env);
+  if (!user) {
+    return json(401, { success: false, message: "not_logged_in" });
+  }
+  const group = await myGroup(env, user.phone);
+  if (!group) {
+    return json(404, { success: false, message: "group_membership_not_found" });
+  }
+  const data = await readJsonBody(request);
+  const id = String(data.id || "").trim();
+  const rows = await dataGet(env, "group_messages", []);
+  const row = rows.find((item) => item.id === id && item.group_id === group.id);
+  if (!row) {
+    return json(404, { success: false, message: "message_not_found" });
+  }
+  const isAdmin = canManageGroup(group, user.phone);
+  if (!isAdmin && row.sender_phone !== user.phone) {
+    return json(403, { success: false, message: "forbidden" });
+  }
+  await dataDelete(env, "group_messages", "id", id);
+  return json(200, { success: true });
 }

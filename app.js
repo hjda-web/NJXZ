@@ -7,6 +7,7 @@
     config: null,
     loginMode: "login",
     pendingPhone: "",
+    commonCropsPrompted: false,
     cities: [],
     catalog: [],
     products: [],
@@ -17,6 +18,7 @@
   var SHELL_ID = "site-header";
   var LOGIN_DIALOG_ID = "login-dialog";
   var PROFILE_DIALOG_ID = "profile-dialog";
+  var COMMON_CROPS_DIALOG_ID = "common-crops-dialog";
   var TOAST_ID = "toast-region";
   var API_BASE = "https://dtmgzhiojlhrlqwczhxs.supabase.co/functions/v1/nzx-api";
   var IDENTITIES = [
@@ -34,6 +36,7 @@
     injectShell();
     injectLoginDialog();
     injectProfileDialog();
+    injectCommonCropsDialog();
     bindGlobalEvents();
     bootstrap();
   });
@@ -191,6 +194,8 @@
       '<input id="login-confirm" name="confirm" type="password" maxlength="6" autocomplete="new-password" placeholder="再次输入 6 位密码">',
       '<small class="field-error" id="confirm-error"></small>',
       "</label>",
+      '<label class="login-field"><span>常种植作物（可跳过）</span>',
+      '<select id="login-common-crops" multiple size="4"></select></label>',
       '<p class="login-error" id="login-error" role="alert"></p>',
       '<button class="primary-button login-submit" id="login-submit" type="submit">登录</button>',
       '<p class="login-foot" id="login-foot">未注册手机号将在首次登录时设置 6 位数字密码</p>',
@@ -236,6 +241,7 @@
       '<label class="login-field profile-font-field"><span>字体大小</span><select id="profile-font">',
       '<option value="normal">普通字号</option><option value="large">老年大字号</option>',
       '</select></label>',
+      '<label class="login-field"><span>常种植作物</span><select id="profile-common-crops" multiple size="5"></select></label>',
       '<p class="login-error" id="profile-error" role="alert"></p>',
       '<button class="primary-button login-submit" id="profile-save" type="submit">保存设置</button>',
       '<button class="secondary-button login-submit profile-login-button" id="profile-login" type="button" style="display:none;width:100%;margin-top:8px;">登录 / 注册</button>',
@@ -247,6 +253,113 @@
     document.getElementById("profile-login").addEventListener("click", function () {
       closeProfile();
       openLogin(false);
+    });
+  }
+
+  function injectCommonCropsDialog() {
+    if (document.getElementById(COMMON_CROPS_DIALOG_ID)) {
+      return;
+    }
+    var dialog = document.createElement("dialog");
+    dialog.className = "login-dialog common-crops-dialog";
+    dialog.id = COMMON_CROPS_DIALOG_ID;
+    dialog.innerHTML = [
+      '<form id="common-crops-form" novalidate>',
+      '<div class="dialog-head"><div><p class="eyebrow">个性化设置</p><h2>选择常种植作物</h2></div>',
+      '<button class="dialog-close" id="common-crops-close" type="button" aria-label="关闭">×</button></div>',
+      '<label class="login-field"><span>常种植作物（可多选，可跳过）</span>',
+      '<select id="common-crops-select" multiple size="7"></select></label>',
+      '<p class="login-error" id="common-crops-error" role="alert"></p>',
+      '<button class="primary-button login-submit" id="common-crops-save" type="submit">保存</button>',
+      '<button class="secondary-button login-submit" id="common-crops-skip" type="button" style="margin-top:8px;">暂时跳过</button>',
+      "</form>"
+    ].join("");
+    document.body.appendChild(dialog);
+    document.getElementById("common-crops-form").addEventListener("submit", saveCommonCrops);
+    document.getElementById("common-crops-skip").addEventListener("click", function () {
+      SITE.commonCropsPrompted = true;
+      closeCommonCrops();
+    });
+    document.getElementById("common-crops-close").addEventListener("click", function () {
+      SITE.commonCropsPrompted = true;
+      closeCommonCrops();
+    });
+  }
+
+  function fillCommonCropsSelect() {
+    var select = document.getElementById("common-crops-select");
+    if (!select || select.options.length) {
+      return;
+    }
+    select.innerHTML = NZX_APP.products().map(function (product) {
+      return '<option value="' + product.name + '">' + product.name + "</option>";
+    }).join("");
+    var current = SITE.user && SITE.user.commonCrops || [];
+    Array.prototype.forEach.call(select.options, function (option) {
+      option.selected = current.indexOf(option.value) >= 0;
+    });
+  }
+
+  function maybePromptCommonCrops() {
+    if (SITE.commonCropsPrompted || !SITE.user || !SITE.user.phone) {
+      return;
+    }
+    SITE.commonCropsPrompted = true;
+    if (SITE.user.commonCrops && SITE.user.commonCrops.length) {
+      return;
+    }
+    if (SITE.products.length) {
+      fillCommonCropsSelect();
+      openCommonCrops();
+    } else {
+      loadCatalog().then(fillCommonCropsSelect).then(openCommonCrops).catch(function () {});
+    }
+  }
+
+  function openCommonCrops() {
+    var dialog = document.getElementById(COMMON_CROPS_DIALOG_ID);
+    if (!dialog) {
+      return;
+    }
+    fillCommonCropsSelect();
+    if (typeof dialog.showModal === "function") {
+      dialog.showModal();
+    } else {
+      dialog.setAttribute("open", "");
+    }
+  }
+
+  function closeCommonCrops() {
+    var dialog = document.getElementById(COMMON_CROPS_DIALOG_ID);
+    if (dialog && typeof dialog.close === "function") {
+      dialog.close();
+    } else if (dialog) {
+      dialog.removeAttribute("open");
+    }
+  }
+
+  function saveCommonCrops(event) {
+    event.preventDefault();
+    var select = document.getElementById("common-crops-select");
+    var crops = Array.prototype.filter.call(select.options, function (option) {
+      return option.selected;
+    }).map(function (option) {
+      return option.value;
+    });
+    api("/api/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nickname: SITE.user.nickname || "", city: SITE.user.city || "", largeFont: SITE.user.largeFont, commonCrops: crops })
+    }).then(function (data) {
+      SITE.user = data.user;
+      renderAccountArea();
+      closeCommonCrops();
+      showToast("常种植作物已保存", "success");
+      if (SITE.config && typeof SITE.config.render === "function") {
+        SITE.config.render();
+      }
+    }).catch(function () {
+      document.getElementById("common-crops-error").textContent = "保存失败";
     });
   }
 
@@ -284,6 +397,7 @@
       SITE.user = data.user || data;
       renderAccountArea();
       applyFontMode();
+      maybePromptCommonCrops();
       return SITE.user;
     }).catch(function () {
       SITE.user = null;
@@ -409,6 +523,11 @@
     var confirm = document.getElementById("login-confirm").value;
     var city = document.getElementById("login-city").value;
     var identity = document.getElementById("login-identity").value;
+    var commonCrops = Array.prototype.filter.call(document.getElementById("login-common-crops").options, function (option) {
+      return option.selected;
+    }).map(function (option) {
+      return option.value;
+    });
     var valid = true;
 
     if (!/^[0-9]{11}$/.test(phone)) {
@@ -447,7 +566,7 @@
     api("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone: phone, password: password, city: city, identity: identity })
+      body: JSON.stringify({ phone: phone, password: password, city: city, identity: identity, commonCrops: commonCrops })
     }).then(function (data) {
       SITE.user = data.user;
       SITE.guestCity = data.user.city || city;
@@ -455,6 +574,7 @@
       renderAccountArea();
       closeLogin();
       showToast("登录成功", "success");
+      maybePromptCommonCrops();
       if (SITE.config && typeof SITE.config.render === "function") {
         SITE.config.render();
       } else {
@@ -533,6 +653,12 @@
     document.getElementById("confirm-field").classList.add("register-only");
     document.getElementById("login-submit").textContent = "登录";
     document.getElementById("login-foot").textContent = "未注册手机号将在首次登录时设置 6 位数字密码";
+    var loginCrops = document.getElementById("login-common-crops");
+    if (loginCrops) {
+      loginCrops.innerHTML = NZX_APP.products().map(function (product) {
+        return '<option value="' + product.name + '">' + product.name + "</option>";
+      }).join("");
+    }
     clearLoginErrors();
   }
 
@@ -566,6 +692,16 @@
     }
     if (fontSelect) {
       fontSelect.value = SITE.user && SITE.user.largeFont ? "large" : "normal";
+    }
+    var commonCropsSelect = document.getElementById("profile-common-crops");
+    if (commonCropsSelect) {
+      commonCropsSelect.innerHTML = NZX_APP.products().map(function (product) {
+        return '<option value="' + product.name + '">' + product.name + "</option>";
+      }).join("");
+      var currentCrops = SITE.user && SITE.user.commonCrops || [];
+      Array.prototype.forEach.call(commonCropsSelect.options, function (option) {
+        option.selected = currentCrops.indexOf(option.value) >= 0;
+      });
     }
     document.getElementById("profile-login").style.display = SITE.user ? "none" : "";
     document.getElementById("profile-error").textContent = "";
@@ -605,6 +741,11 @@
 
     var nickname = document.getElementById("profile-nickname").value.trim();
     var largeFont = document.getElementById("profile-font").value === "large";
+    var commonCrops = Array.prototype.filter.call(document.getElementById("profile-common-crops").options, function (option) {
+      return option.selected;
+    }).map(function (option) {
+      return option.value;
+    });
     if (SITE.user.role !== "admin" && (nickname.length < 2 || nickname.length > 20)) {
       document.getElementById("profile-nickname-error").textContent = "昵称需为 2 至 20 个字符";
       return;
@@ -612,7 +753,7 @@
     api("/api/profile", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nickname: nickname, city: city, largeFont: largeFont })
+      body: JSON.stringify({ nickname: nickname, city: city, largeFont: largeFont, commonCrops: commonCrops })
     }).then(function (data) {
       SITE.user = data.user;
       renderAccountArea();

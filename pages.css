@@ -812,3 +812,167 @@ body.large-font .catalog-tab {
     min-width: 150px;
   }
 }
+
+.crop-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.crop-chip {
+  display: inline-flex;
+  min-height: 30px;
+  padding: 0 12px;
+  align-items: center;
+  border: 1px solid #b9c6d6;
+  border-radius: 999px;
+  color: #2c3a51;
+  background: #ffffff;
+  font-weight: 700;
+}
+
+.solar-term-tasks {
+  margin: 0;
+  color: #39465c;
+  line-height: 1.8;
+}
+
+.fertilizer-crop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.fertilizer-crop-item {
+  padding: 11px;
+  border: 1px solid #d8e0ec;
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.fertilizer-crop-item strong,
+.fertilizer-crop-item span {
+  display: block;
+}
+
+.fertilizer-crop-item span {
+  margin-top: 5px;
+  color: #5d6b83;
+  font-size: 12px;
+}
+
+.fertilizer-prices {
+  margin-top: 16px;
+  padding-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  border-top: 1px solid #e7ecf3;
+}
+
+.fertilizer-price-item {
+  padding: 10px 12px;
+  border: 1px solid #d8e0ec;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.fertilizer-price-item strong,
+.fertilizer-price-item span {
+  display: block;
+}
+
+.fertilizer-price-item span {
+  margin-top: 5px;
+  color: #425069;
+}
+
+.frequent-risk-block {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e7ecf3;
+}
+
+.frequent-risk-block h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.group-message-section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #e7ecf3;
+}
+
+.group-message-section h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.group-message-form {
+  display: flex;
+  gap: 8px;
+}
+
+.group-message-form input {
+  flex: 1;
+  height: 38px;
+  padding: 0 11px;
+  border: 1px solid #c9d3e1;
+  border-radius: 7px;
+}
+
+.group-message-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.group-message-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #e7ecf3;
+}
+
+.group-message-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #5d6b83;
+  font-size: 12px;
+}
+
+.group-message-content {
+  margin-top: 4px;
+  color: #172033;
+}
+
+.common-crops-dialog select,
+#login-common-crops,
+#profile-common-crops {
+  width: 100%;
+  min-height: 120px;
+  padding: 8px;
+  border: 1px solid #c9d3e1;
+  border-radius: 7px;
+}
+
+.agri-list {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.agri-list-item {
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #d8e0ec;
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.agri-list-item span {
+  color: #425069;
+}

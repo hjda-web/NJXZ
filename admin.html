@@ -25,6 +25,7 @@
       <button type="button" data-tab="model">模型管理</button>
       <button type="button" data-tab="logs">操作日志</button>
       <button type="button" data-tab="settings">系统设置</button>
+      <button type="button" data-tab="agri">农事资料</button>
     </nav>
 
     <section class="tab-view" id="tab-data">
@@ -151,9 +152,56 @@
         </div>
       </div>
     </section>
+
+    <section class="tab-view" id="tab-agri" hidden>
+      <div class="content-grid">
+        <div class="panel">
+          <div class="panel-header"><h2>省份适合作物</h2></div>
+          <div class="panel-body">
+            <label class="field"><span>省份</span><input id="agri-region-province" type="text" maxlength="30" placeholder="例如 四川"></label>
+            <label class="field"><span>适合作物（用顿号分隔）</span><input id="agri-region-crops" type="text" placeholder="水稻、油菜、小麦"></label>
+            <button class="primary-button" id="agri-region-save" type="button">保存</button>
+            <div class="agri-list" id="agri-region-list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h2>节气农事</h2></div>
+          <div class="panel-body">
+            <label class="field"><span>节气</span><input id="agri-term" type="text" maxlength="20" placeholder="例如 立春"></label>
+            <label class="field"><span>对应农事</span><textarea id="agri-tasks" rows="3"></textarea></label>
+            <button class="primary-button" id="agri-term-save" type="button">保存</button>
+            <div class="agri-list" id="agri-term-list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h2>作物肥料需求</h2></div>
+          <div class="panel-body">
+            <label class="field"><span>作物</span><input id="agri-fertilizer-crop" type="text" maxlength="30" placeholder="例如 土豆"></label>
+            <label class="field"><span>肥料（用顿号分隔）</span><input id="agri-fertilizer-values" type="text" placeholder="钾肥"></label>
+            <button class="primary-button" id="agri-fertilizer-save" type="button">保存</button>
+            <div class="agri-list" id="agri-fertilizer-list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h2>肥料价格</h2></div>
+          <div class="panel-body">
+            <label class="field"><span>肥料</span><input id="agri-price-name" type="text" maxlength="20" placeholder="例如 氮肥"></label>
+            <label class="field"><span>最低价</span><input id="agri-price-min" type="number" min="0"></label>
+            <label class="field"><span>最高价</span><input id="agri-price-max" type="number" min="0"></label>
+            <label class="field"><span>单位</span><input id="agri-price-unit" type="text" value="元/吨"></label>
+            <button class="primary-button" id="agri-price-save" type="button">保存</button>
+            <div class="agri-list" id="agri-price-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="mock-data.js"></script>
+  <script src="data-client.js"></script>
   <script src="app.js"></script>
   <script src="admin.js"></script>
 </body>

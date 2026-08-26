@@ -101,6 +101,103 @@
       "&limit=" + Number(limit || 12));
   }
 
+  function regionCrops(province) {
+    return request("/api/region-crops?province=" + encodeURIComponent(province || ""));
+  }
+
+  function solarTerm(date) {
+    return request("/api/solar-term?date=" + encodeURIComponent(date || ""));
+  }
+
+  function fertilizerRules() {
+    return request("/api/fertilizer-rules");
+  }
+
+  function fertilizerPrices() {
+    return request("/api/fertilizer-prices");
+  }
+
+  function groupMessages() {
+    return request("/api/group-messages");
+  }
+
+  function createGroupMessage(content) {
+    return post("/api/group-messages", { content: content });
+  }
+
+  function deleteGroupMessage(id) {
+    return post("/api/group-messages/delete", { id: id });
+  }
+
+  function adminRegionCrops() {
+    return request("/api/admin/region-crops");
+  }
+
+  function saveRegionCrops(province, crops) {
+    return post("/api/admin/region-crops", { province: province, crops: crops });
+  }
+
+  function deleteRegionCrops(province) {
+    return request("/api/admin/region-crops", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ province: province })
+    });
+  }
+
+  function adminSolarTerms() {
+    return request("/api/admin/solar-terms");
+  }
+
+  function saveSolarTerm(term, tasks) {
+    return post("/api/admin/solar-terms", { term: term, tasks: tasks });
+  }
+
+  function deleteSolarTerm(term) {
+    return request("/api/admin/solar-terms", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ term: term })
+    });
+  }
+
+  function adminFertilizerRules() {
+    return request("/api/admin/fertilizer-rules");
+  }
+
+  function saveFertilizerRule(crop, fertilizers) {
+    return post("/api/admin/fertilizer-rules", { crop: crop, fertilizers: fertilizers });
+  }
+
+  function deleteFertilizerRule(crop) {
+    return request("/api/admin/fertilizer-rules", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ crop: crop })
+    });
+  }
+
+  function adminFertilizerPrices() {
+    return request("/api/admin/fertilizer-prices");
+  }
+
+  function saveFertilizerPrice(fertilizer, minPrice, maxPrice, unit) {
+    return post("/api/admin/fertilizer-prices", {
+      fertilizer: fertilizer,
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      unit: unit
+    });
+  }
+
+  function deleteFertilizerPrice(fertilizer) {
+    return request("/api/admin/fertilizer-prices", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fertilizer: fertilizer })
+    });
+  }
+
   function formatDate(value) {
     if (value === null || value === undefined || value === "") {
       return "--";
@@ -133,6 +230,25 @@
     setGroupRecommendations: setGroupRecommendations,
     myGroup: myGroup,
     groupRecommendProducts: groupRecommendProducts,
+    regionCrops: regionCrops,
+    solarTerm: solarTerm,
+    fertilizerRules: fertilizerRules,
+    fertilizerPrices: fertilizerPrices,
+    groupMessages: groupMessages,
+    createGroupMessage: createGroupMessage,
+    deleteGroupMessage: deleteGroupMessage,
+    adminRegionCrops: adminRegionCrops,
+    saveRegionCrops: saveRegionCrops,
+    deleteRegionCrops: deleteRegionCrops,
+    adminSolarTerms: adminSolarTerms,
+    saveSolarTerm: saveSolarTerm,
+    deleteSolarTerm: deleteSolarTerm,
+    adminFertilizerRules: adminFertilizerRules,
+    saveFertilizerRule: saveFertilizerRule,
+    deleteFertilizerRule: deleteFertilizerRule,
+    adminFertilizerPrices: adminFertilizerPrices,
+    saveFertilizerPrice: saveFertilizerPrice,
+    deleteFertilizerPrice: deleteFertilizerPrice,
     formatDate: formatDate
   };
 })();
