@@ -182,9 +182,10 @@
   }
 
   function fertilizersForCrop(crop, rules) {
-    var item = NZX_APP.product(crop);
+    var lookupCrop = fertilizerAliasMap[crop] || crop;
+    var item = NZX_APP.product(lookupCrop);
     var set = {};
-    var rule = rules.find(function (entry) { return entry.crop === crop; });
+    var rule = rules.find(function (entry) { return entry.crop === crop || entry.crop === lookupCrop; });
     if (rule) {
       (rule.fertilizers || [rule.fertilizer]).filter(Boolean).forEach(function (name) {
         if (name !== "不适用") {
@@ -199,7 +200,7 @@
     if (["瓜茄类", "鲜豆类", "干豆类"].indexOf(subcategory) >= 0) {
       set["磷肥"] = true;
     }
-    if (subcategory === "根茎类" || highSugarCrops.indexOf(crop) >= 0) {
+    if (subcategory === "根茎类" || highSugarCrops.indexOf(lookupCrop) >= 0) {
       set["钾肥"] = true;
     }
     return Object.keys(set);
@@ -210,6 +211,17 @@
     "猕猴桃", "牛油果", "柠檬", "桃", "李子", "樱桃", "火龙果", "芒果",
     "红薯", "山药", "芋头", "莲藕", "马蹄", "胡萝卜"
   ];
+
+  var fertilizerAliasMap = {
+    "水稻": "大米",
+    "粳稻": "大米",
+    "小麦": "面粉",
+    "春小麦": "面粉",
+    "冬小麦": "面粉",
+    "大豆": "黄豆",
+    "马铃薯": "土豆",
+    "谷子": "小米"
+  };
 
   function renderChart() {
     var products = ["猪肉", "鸡蛋", "土豆", "大白菜", "黄瓜"];

@@ -119,7 +119,7 @@ export default {
       }
 
       if (path === "api/solar-term" && method === "GET") {
-        return json(200, solarTermForDate(query.get("date") || ""));
+        return json(200, await solarTermForDate(query.get("date") || "", env));
       }
 
       if (path === "api/fertilizer-rules" && method === "GET") {
@@ -491,7 +491,26 @@ function provinceForCity(cityName) {
   return city ? city.province : "";
 }
 
-function solarTermForDate(dateString) {
+function normalizeProvinceName(province) {
+  if (!province) {
+    return "";
+  }
+  if (province.endsWith("省")) {
+    return province.slice(0, -1);
+  }
+  if (province.endsWith("市")) {
+    return province.slice(0, -1);
+  }
+  if (province.endsWith("自治区")) {
+    return province.slice(0, -3);
+  }
+  if (province.endsWith("特别行政区")) {
+    return province.slice(0, -5);
+  }
+  return province;
+}
+
+async function solarTermForDate(dateString, env) {
   const date = dateString ? new Date(`${dateString}T12:00:00+08:00`) : new Date(Date.now() + 8 * 60 * 60 * 1000);
   if (Number.isNaN(date.getTime())) {
     return { term: "", tasks: "" };
@@ -507,7 +526,8 @@ function solarTermForDate(dateString) {
     termIndex = currentIndex - 1;
   }
   const termName = solarTermDates[termIndex][0];
-  const term = solarTermsData.find((item) => item.term === termName);
+  const terms = await getSolarTerms(env);
+  const term = terms.find((item) => item.term === termName);
   return term ? term : { term: termName, tasks: "" };
 }
 
@@ -1671,13 +1691,29 @@ async function handleGroupRecommendProducts(request, env, query) {
   }
   const candidates = await buildRecommendationCandidates(city, 10000);
   const province = provinceForCity(city);
-  const regionRow = regionCropsData.find((item) => item.province === province);
+  const regionRows = await getRegionCrops(env);
+  const normalizedProvince = normalizeProvinceName(province);
+  const regionRow = regionRows.find((item) => normalizeProvinceName(item.province) === normalizedProvince);
   const regionSet = new Set(regionRow ? regionRow.crops : []);
+  const regionCandidateMap = new Map(candidates.map((item) => [item.product, item]));
+  const regionItems = regionRow ? regionRow.crops.map((crop) => {
+    return regionCandidateMap.get(crop) || {
+      product: crop,
+      category: "",
+      subcategory: "",
+      score: 100,
+      level: "优",
+      reason: "本省适合作物"
+    };
+  }) : [];
   const coastalProvinces = new Set(["天津", "河北", "辽宁", "上海", "江苏", "浙江", "福建", "山东", "广东", "广西", "海南", "台湾", "香港", "澳门"]);
   const isCoastal = coastalProvinces.has(province);
   const incompatibleSubcategories = isCoastal ? [] : ["鱼类", "虾蟹贝类", "藻类"];
-  const items = candidates
+  const otherItems = candidates
     .filter((item) => {
+      if (regionSet.has(item.product)) {
+        return false;
+      }
       const catalogItem = catalogFind(item.product);
       if (catalogItem && incompatibleSubcategories.includes(catalogItem.subcategory)) {
         return false;
@@ -1685,13 +1721,10 @@ async function handleGroupRecommendProducts(request, env, query) {
       return true;
     })
     .sort((a, b) => {
-      const aRegion = regionSet.has(a.product) ? 0 : 1;
-      const bRegion = regionSet.has(b.product) ? 0 : 1;
-      if (aRegion !== bRegion) {
-        return aRegion - bRegion;
-      }
       return b.score - a.score;
-    })
+    });
+  const items = regionItems
+    .concat(otherItems)
     .slice(0, 12);
   return json(200, { success: true, city, items });
 }
@@ -2164,7 +2197,8 @@ async function dataDelete(env, table, keyName, keyValue) {
 async function getRegionCrops(env, province) {
   const rows = await dataGet(env, "region_crops", regionCropsData);
   if (province) {
-    const row = rows.find((item) => item.province === province);
+    const normalized = normalizeProvinceName(province);
+    const row = rows.find((item) => normalizeProvinceName(item.province) === normalized);
     return {
       province,
       available: Boolean(row),
