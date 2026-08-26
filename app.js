@@ -195,7 +195,7 @@
       '<small class="field-error" id="confirm-error"></small>',
       "</label>",
       '<label class="login-field"><span>常种植作物（可跳过）</span>',
-      '<select id="login-common-crops" multiple size="4"></select></label>',
+      '<div class="common-crops-options" id="login-common-crops-options"></div></label>',
       '<p class="login-error" id="login-error" role="alert"></p>',
       '<button class="primary-button login-submit" id="login-submit" type="submit">登录</button>',
       '<p class="login-foot" id="login-foot">未注册手机号将在首次登录时设置 6 位数字密码</p>',
@@ -241,7 +241,7 @@
       '<label class="login-field profile-font-field"><span>字体大小</span><select id="profile-font">',
       '<option value="normal">普通字号</option><option value="large">老年大字号</option>',
       '</select></label>',
-      '<label class="login-field"><span>常种植作物</span><select id="profile-common-crops" multiple size="5"></select></label>',
+      '<label class="login-field"><span>常种植作物</span><div class="common-crops-options" id="profile-common-crops-options"></div></label>',
       '<p class="login-error" id="profile-error" role="alert"></p>',
       '<button class="primary-button login-submit" id="profile-save" type="submit">保存设置</button>',
       '<button class="secondary-button login-submit profile-login-button" id="profile-login" type="button" style="display:none;width:100%;margin-top:8px;">登录 / 注册</button>',
@@ -268,7 +268,7 @@
       '<div class="dialog-head"><div><p class="eyebrow">个性化设置</p><h2>选择常种植作物</h2></div>',
       '<button class="dialog-close" id="common-crops-close" type="button" aria-label="关闭">×</button></div>',
       '<label class="login-field"><span>常种植作物（可多选，可跳过）</span>',
-      '<select id="common-crops-select" multiple size="7"></select></label>',
+      '<div class="common-crops-options" id="common-crops-options"></div></label>',
       '<p class="login-error" id="common-crops-error" role="alert"></p>',
       '<button class="primary-button login-submit" id="common-crops-save" type="submit">保存</button>',
       '<button class="secondary-button login-submit" id="common-crops-skip" type="button" style="margin-top:8px;">暂时跳过</button>',
@@ -287,17 +287,15 @@
   }
 
   function fillCommonCropsSelect() {
-    var select = document.getElementById("common-crops-select");
-    if (!select || select.options.length) {
+    var box = document.getElementById("common-crops-options");
+    if (!box || box.children.length) {
       return;
     }
-    select.innerHTML = NZX_APP.products().map(function (product) {
-      return '<option value="' + product.name + '">' + product.name + "</option>";
-    }).join("");
     var current = SITE.user && SITE.user.commonCrops || [];
-    Array.prototype.forEach.call(select.options, function (option) {
-      option.selected = current.indexOf(option.value) >= 0;
-    });
+    box.innerHTML = NZX_APP.products().map(function (product) {
+      var checked = current.indexOf(product.name) >= 0 ? ' checked="checked"' : "";
+      return '<label class="crop-check"><input type="checkbox" value="' + product.name + '"' + checked + '><span>' + product.name + "</span></label>";
+    }).join("");
   }
 
   function maybePromptCommonCrops() {
@@ -340,11 +338,10 @@
 
   function saveCommonCrops(event) {
     event.preventDefault();
-    var select = document.getElementById("common-crops-select");
-    var crops = Array.prototype.filter.call(select.options, function (option) {
-      return option.selected;
-    }).map(function (option) {
-      return option.value;
+    var crops = Array.prototype.filter.call(document.querySelectorAll("#common-crops-options input[type=checkbox]"), function (input) {
+      return input.checked;
+    }).map(function (input) {
+      return input.value;
     });
     api("/api/profile", {
       method: "POST",
@@ -523,10 +520,10 @@
     var confirm = document.getElementById("login-confirm").value;
     var city = document.getElementById("login-city").value;
     var identity = document.getElementById("login-identity").value;
-    var commonCrops = Array.prototype.filter.call(document.getElementById("login-common-crops").options, function (option) {
-      return option.selected;
-    }).map(function (option) {
-      return option.value;
+    var commonCrops = Array.prototype.filter.call(document.querySelectorAll("#login-common-crops-options input[type=checkbox]"), function (input) {
+      return input.checked;
+    }).map(function (input) {
+      return input.value;
     });
     var valid = true;
 
@@ -653,10 +650,10 @@
     document.getElementById("confirm-field").classList.add("register-only");
     document.getElementById("login-submit").textContent = "登录";
     document.getElementById("login-foot").textContent = "未注册手机号将在首次登录时设置 6 位数字密码";
-    var loginCrops = document.getElementById("login-common-crops");
+    var loginCrops = document.getElementById("login-common-crops-options");
     if (loginCrops) {
       loginCrops.innerHTML = NZX_APP.products().map(function (product) {
-        return '<option value="' + product.name + '">' + product.name + "</option>";
+        return '<label class="crop-check"><input type="checkbox" value="' + product.name + '"><span>' + product.name + "</span></label>";
       }).join("");
     }
     clearLoginErrors();
@@ -693,15 +690,13 @@
     if (fontSelect) {
       fontSelect.value = SITE.user && SITE.user.largeFont ? "large" : "normal";
     }
-    var commonCropsSelect = document.getElementById("profile-common-crops");
+    var commonCropsSelect = document.getElementById("profile-common-crops-options");
     if (commonCropsSelect) {
-      commonCropsSelect.innerHTML = NZX_APP.products().map(function (product) {
-        return '<option value="' + product.name + '">' + product.name + "</option>";
-      }).join("");
       var currentCrops = SITE.user && SITE.user.commonCrops || [];
-      Array.prototype.forEach.call(commonCropsSelect.options, function (option) {
-        option.selected = currentCrops.indexOf(option.value) >= 0;
-      });
+      commonCropsSelect.innerHTML = NZX_APP.products().map(function (product) {
+        var checked = currentCrops.indexOf(product.name) >= 0 ? ' checked="checked"' : "";
+        return '<label class="crop-check"><input type="checkbox" value="' + product.name + '"' + checked + '><span>' + product.name + "</span></label>";
+      }).join("");
     }
     document.getElementById("profile-login").style.display = SITE.user ? "none" : "";
     document.getElementById("profile-error").textContent = "";
@@ -741,10 +736,10 @@
 
     var nickname = document.getElementById("profile-nickname").value.trim();
     var largeFont = document.getElementById("profile-font").value === "large";
-    var commonCrops = Array.prototype.filter.call(document.getElementById("profile-common-crops").options, function (option) {
-      return option.selected;
-    }).map(function (option) {
-      return option.value;
+    var commonCrops = Array.prototype.filter.call(document.querySelectorAll("#profile-common-crops-options input[type=checkbox]"), function (input) {
+      return input.checked;
+    }).map(function (input) {
+      return input.value;
     });
     if (SITE.user.role !== "admin" && (nickname.length < 2 || nickname.length > 20)) {
       document.getElementById("profile-nickname-error").textContent = "昵称需为 2 至 20 个字符";

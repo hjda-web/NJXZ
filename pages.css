@@ -843,6 +843,41 @@ body.large-font .catalog-tab {
   gap: 10px;
 }
 
+.crop-table {
+  width: 100%;
+  border: 1px solid #d8e0ec;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.crop-table-row {
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 0.65fr 1.4fr;
+  align-items: center;
+  border-bottom: 1px solid #e7ecf3;
+}
+
+.crop-table-row:last-child {
+  border-bottom: 0;
+}
+
+.crop-table-row > span {
+  padding: 10px 12px;
+  border-right: 1px solid #e7ecf3;
+}
+
+.crop-table-row > span:last-child {
+  border-right: 0;
+}
+
+.crop-table-header {
+  min-height: 40px;
+  color: #4c5a72;
+  background: #f7f9fc;
+  font-weight: 800;
+}
+
 .fertilizer-crop-item {
   padding: 11px;
   border: 1px solid #d8e0ec;
@@ -956,6 +991,32 @@ body.large-font .catalog-tab {
   border-radius: 7px;
 }
 
+.common-crops-options {
+  max-height: 190px;
+  padding: 9px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 7px;
+  overflow-y: auto;
+  border: 1px solid #c9d3e1;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.crop-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #2c3a51;
+  font-size: 13px;
+}
+
+.crop-check input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
 .agri-list {
   margin-top: 14px;
   display: grid;
@@ -975,4 +1036,14 @@ body.large-font .catalog-tab {
 
 .agri-list-item span {
   color: #425069;
+}
+
+@media (max-width: 640px) {
+  .crop-table-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .crop-table-row > span:nth-child(2) {
+    border-right: 0;
+  }
 }

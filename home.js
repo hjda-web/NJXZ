@@ -121,6 +121,7 @@
     var regionCrops = [];
     var commonCrops = user.commonCrops || [];
     var groupCrops = [];
+    var riskItems = [];
 
     var requests = [];
     requests.push(NZX_DATA_API.regionCrops(province).then(function (result) {
@@ -131,6 +132,9 @@
     }).catch(function () {}));
     requests.push(NZX_DATA_API.fertilizerPrices().then(function (prices) {
       window.__nzxFertilizerPrices = prices;
+    }).catch(function () {}));
+    requests.push(NZX_DATA_API.risks(city, 30).then(function (result) {
+      riskItems = result.items || [];
     }).catch(function () {}));
     if (user.identity === "individual") {
       requests.push(NZX_DATA_API.myGroup().then(function (result) {
@@ -147,18 +151,43 @@
       var board = document.getElementById("fertilizer-board");
       var priceBox = document.getElementById("fertilizer-prices");
       if (!crops.length) {
-        board.innerHTML = '<div class="empty-state">暂无种植与肥料数据</div>';
+        board.innerHTML = '<div class="empty-state">暂无农产品数据</div>';
         priceBox.innerHTML = "";
         return;
       }
       var cropsWithFertilizer = crops.map(function (crop) {
-        return { crop: crop, fertilizers: fertilizersForCrop(crop, rules) };
+        var sources = [];
+        if (regionCrops.indexOf(crop) >= 0) {
+          sources.push("地区推荐");
+        }
+        if (commonCrops.indexOf(crop) >= 0) {
+          sources.push("常种作物");
+        }
+        if (groupCrops.indexOf(crop) >= 0) {
+          sources.push("小组推荐");
+        }
+        var risk = riskItems.find(function (item) { return item.product === crop; });
+        var riskScore = risk && risk.score !== undefined ? risk.score : "--";
+        var fertilizers = fertilizersForCrop(crop, rules);
+        return {
+          crop: crop,
+          source: sources.join("、") || "—",
+          riskScore: riskScore,
+          fertilizers: fertilizers
+        };
       });
-      board.innerHTML = '<div class="fertilizer-crop-grid">' +
+      board.innerHTML = '<div class="crop-table">' +
+        '<div class="crop-table-row crop-table-header">' +
+          '<span>农作物名称</span><span>来源</span><span>风险分</span><span>要用到的肥料</span>' +
+        '</div>' +
         cropsWithFertilizer.map(function (item) {
           var text = item.fertilizers.length ? item.fertilizers.join("、") : "不适用";
-          return '<div class="fertilizer-crop-item"><strong>' + escapeHtml(item.crop) +
-            "</strong><span>" + escapeHtml(text) + "</span></div>";
+          return '<div class="crop-table-row">' +
+            '<span><strong>' + escapeHtml(item.crop) + '</strong></span>' +
+            '<span>' + escapeHtml(item.source) + '</span>' +
+            '<span>' + escapeHtml(String(item.riskScore)) + '</span>' +
+            '<span>' + escapeHtml(text) + '</span>' +
+            '</div>';
         }).join("") + "</div>";
       var visiblePrices = prices.filter(function (item) {
         return item.fertilizer !== "不适用";
@@ -171,7 +200,7 @@
           " " + escapeHtml(item.unit || "元/吨") + "</span></div>";
       }).join("");
     }).catch(function () {
-      document.getElementById("fertilizer-board").innerHTML = '<div class="empty-state">肥料数据不可用</div>';
+      document.getElementById("fertilizer-board").innerHTML = '<div class="empty-state">农产品数据不可用</div>';
       document.getElementById("fertilizer-prices").innerHTML = "";
     });
   }
@@ -267,42 +296,9 @@
           "</li>"
         ].join("");
       }).join("");
-      renderFrequentRisk(alerts);
     }).catch(function () {
       list.innerHTML = '<li class="empty-state">风险预警暂时不可用</li>';
-      document.getElementById("frequent-risk-block").hidden = true;
     });
-  }
-
-  function renderFrequentRisk(alerts) {
-    var block = document.getElementById("frequent-risk-block");
-    var list = document.getElementById("frequent-risk-list");
-    var commonCrops = NZX_APP.user() && NZX_APP.user().commonCrops || [];
-    if (!block || !commonCrops.length) {
-      if (block) {
-        block.hidden = true;
-      }
-      return;
-    }
-    var matched = commonCrops.map(function (crop) {
-      return alerts.find(function (item) { return item.product === crop; }) || { product: crop, score: "--", level: "", reason: "暂无风险数据" };
-    }).sort(function (a, b) {
-      var av = Number(a.score);
-      var bv = Number(b.score);
-      if (Number.isNaN(av)) { return 1; }
-      if (Number.isNaN(bv)) { return -1; }
-      return bv - av;
-    });
-    block.hidden = false;
-    list.innerHTML = matched.map(function (item) {
-      var levelText = item.level === "high" ? "高风险" : item.level === "medium" ? "中风险" : item.level === "low" ? "低风险" : "暂无";
-      return [
-        "<li>",
-        '<div><div class="trend-name">' + escapeHtml(item.product) + '</div><div class="trend-meta">' + escapeHtml(item.reason || "") + "</div></div>",
-        '<div class="trend-value">' + escapeHtml(String(item.score)) + " · " + levelText + "</div>",
-        "</li>"
-      ].join("");
-    }).join("");
   }
 
   function updateRiskStat(alerts) {
