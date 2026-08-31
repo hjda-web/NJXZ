@@ -9,6 +9,7 @@ import regionCropsData from "../data/region-crops.json";
 import solarTermsData from "../data/solar-terms.json";
 import fertilizerXlsxData from "../data/fertilizer-xlsx.json";
 import fertilizerPricesData from "../data/fertilizer-prices.json";
+import sichuanSpecialData from "../data/sichuan-special.json";
 
 const ORIGIN = "https://hjda-web.github.io";
 const PFSC_KEY = "7s9K$pG2xQ8zR5mB7vA3sD9fH2jW40cV";
@@ -24,6 +25,7 @@ const supplyRecords = new Map();
 const categoryMeans = new Map();
 const regionCropsMap = new Map();
 const fertilizerXlsxMap = new Map();
+const sichuanSpecialMap = new Map();
 
 for (const group of weatherRulesData || []) {
   for (const product of group.Products || []) {
@@ -56,6 +58,13 @@ for (const row of regionCropsData || []) {
 
 for (const row of fertilizerXlsxData || []) {
   fertilizerXlsxMap.set(row.crop, row.fertilizer || "");
+}
+
+for (const row of sichuanSpecialData || []) {
+  if (!sichuanSpecialMap.has(row.product)) {
+    sichuanSpecialMap.set(row.product, []);
+  }
+  sichuanSpecialMap.get(row.product).push(row);
 }
 
 const productCatalog = buildCatalog(catalog);
@@ -439,11 +448,13 @@ function buildCatalog(categories) {
       }
       const group = subcategoryProducts.get(subcategory.name);
       for (const productName of subcategory.products || []) {
-        products.set(productName, {
-          name: productName,
-          category: category.name,
-          subcategory: subcategory.name
-        });
+        if (!products.has(productName)) {
+          products.set(productName, {
+            name: productName,
+            category: category.name,
+            subcategory: subcategory.name
+          });
+        }
         if (!group.includes(productName)) {
           group.push(productName);
         }
@@ -965,6 +976,11 @@ async function getPricesWithFallback(product, city, limit, refresh) {
     }));
   }
 
+  const sichuanRows = sichuanFallbackRows(product);
+  if (sichuanRows.length > 0) {
+    return sichuanRows;
+  }
+
   const item = catalogFind(product);
   if (!item) {
     return [];
@@ -994,6 +1010,33 @@ async function getPricesWithFallback(product, city, limit, refresh) {
     }
   }
   return result;
+}
+
+function sichuanFallbackRows(product) {
+  const rows = sichuanSpecialMap.get(product) || [];
+  if (!rows.length) {
+    return [];
+  }
+  const prices = rows.map((row) => Number(row.price)).filter((value) => Number.isFinite(value));
+  if (!prices.length) {
+    return [];
+  }
+  const average = prices.reduce((sum, value) => sum + value, 0) / prices.length;
+  const sources = Array.from(new Set(rows.map((row) => String(row.source || "").trim()).filter(Boolean)));
+  return [{
+    name: product,
+    avgPrice: round(average * 2, 2).toString(),
+    lowPrice: "",
+    highPrice: "",
+    unit: "元/公斤",
+    place: "四川特色农产品",
+    specInfo: sources.length ? `数据来源：${sources.join("、")}` : "",
+    sourceMarket: "四川特色农产品价格数据",
+    pubDate: rows[0].date || "",
+    dataMode: "sichuan",
+    fallbackCategory: "",
+    referenceProduct: ""
+  }];
 }
 
 async function getWeather(city, refresh) {
@@ -1085,7 +1128,8 @@ async function buildRiskList(cityName, limit, refresh) {
   const products = [
     "猪肉", "鸡蛋", "土豆", "大白菜", "黄瓜", "番茄", "菠菜", "香菇",
     "牛肉", "羊肉", "胡萝卜", "苹果", "油菜", "苦瓜", "杏鲍菇",
-    "哈密瓜", "带鱼", "绿豆"
+    "哈密瓜", "带鱼", "绿豆", "安岳柠檬", "蒲江红心猕猴桃", "耙耙柑",
+    "会理石榴", "攀枝花芒果", "汉源花椒", "通江银耳", "青川木耳"
   ];
   const result = [];
   for (const product of products) {
@@ -1769,6 +1813,8 @@ async function handlePrices(query) {
       ? "全国同类市场价格（回退）"
       : firstItem.dataMode === "national"
         ? "全国市场（所选城市暂无报价）"
+        : firstItem.dataMode === "sichuan"
+          ? "四川特色农产品价格数据"
         : "全国农产品批发市场价格信息系统";
     return json(200, {
       success: true,
