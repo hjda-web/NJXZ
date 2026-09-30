@@ -413,7 +413,15 @@
       fillCitySelects();
       return SITE.cities;
     }).catch(function () {
-      return SITE.cities;
+      return fetch("data/cities.json").then(function (response) {
+        return response.json();
+      }).then(function (cities) {
+        SITE.cities = cities || [];
+        fillCitySelects();
+        return SITE.cities;
+      }).catch(function () {
+        return SITE.cities;
+      });
     });
   }
 
@@ -427,9 +435,17 @@
       indexCatalog();
       return SITE.catalog;
     }).catch(function () {
-      SITE.catalog = [];
-      indexCatalog();
-      return SITE.catalog;
+      return fetch("data/product-catalog.json").then(function (response) {
+        return response.json();
+      }).then(function (catalog) {
+        SITE.catalog = (catalog && catalog.categories) || [];
+        indexCatalog();
+        return SITE.catalog;
+      }).catch(function () {
+        SITE.catalog = [];
+        indexCatalog();
+        return SITE.catalog;
+      });
     });
   }
 
