@@ -1,0 +1,4 @@
+project_id = "dtmgzhiojlhrlqwczhxs"
+
+[functions.nzx-api]
+verify_jwt = false
